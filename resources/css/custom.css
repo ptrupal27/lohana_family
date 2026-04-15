@@ -1,0 +1,126 @@
+:root {
+    --primary-maroon: #800000;
+    --dark-maroon: #4d0000;
+    --gold-accent: #ffd700;
+    --soft-cream: #fffdf5;
+}
+
+body {
+    background-color: #fcfaf2;
+    font-family: 'Noto Sans Gujarati', 'Poppins', sans-serif;
+    color: #333;
+}
+
+.sidebar {
+    min-height: 100vh;
+    background: linear-gradient(180deg, var(--dark-maroon) 0%, var(--primary-maroon) 100%);
+    box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+.sidebar .nav-link {
+    color: rgba(255,255,255,.8);
+    margin: 5px 15px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.sidebar .nav-link:hover {
+    color: var(--gold-accent);
+    background-color: rgba(255,255,255,.1);
+    transform: translateX(5px);
+}
+
+.sidebar .nav-link.active {
+    color: #fff;
+    background: rgba(255,215,0,0.2);
+    border-left: 4px solid var(--gold-accent);
+}
+
+.position-sticky {
+    top: 0;
+    height: calc(100vh - 48px);
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.main-content {
+    padding: 30px;
+}
+
+.card {
+    border: 1px solid rgba(128,0,0,0.1);
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    background-color: #fff;
+    margin-bottom: 20px;
+}
+
+.card-header {
+    background-color: transparent;
+    border-bottom: 2px solid var(--soft-cream);
+    padding: 15px 20px;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    color: var(--primary-maroon) !important;
+    letter-spacing: 1px;
+}
+
+.btn-primary {
+    background-color: var(--primary-maroon);
+    border-color: var(--primary-maroon);
+}
+
+.btn-primary:hover {
+    background-color: var(--dark-maroon);
+    border-color: var(--dark-maroon);
+}
+
+header.navbar {
+    background-color: rgba(255,255,255,0.9) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(128,0,0,0.1);
+}
+
+/* Custom Utilities */
+.text-maroon { color: var(--primary-maroon); }
+.bg-soft-maroon { background-color: rgba(128, 0, 0, 0.03); }
+.btn-outline-primary {
+    color: var(--primary-maroon);
+    border-color: var(--primary-maroon);
+}
+.btn-outline-primary:hover {
+    background-color: var(--primary-maroon);
+    color: white;
+}
+
+/* Dashboard Cards */
+.card-maroon {
+    background: linear-gradient(135deg, var(--primary-maroon), var(--dark-maroon));
+    color: white;
+    border: none !important;
+}
+.card-gold {
+    background: linear-gradient(135deg, #d4af37, #b8860b);
+    color: white;
+    border: none !important;
+}
+.card-crimson {
+    background: linear-gradient(135deg, #dc143c, #8b0000);
+    color: white;
+    border: none !important;
+}
+
+.btn-maroon {
+    background-color: var(--primary-maroon);
+    color: white;
+    border: none;
+}
+.btn-maroon:hover {
+    background-color: var(--dark-maroon);
+    color: white;
+}
+
