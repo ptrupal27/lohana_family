@@ -48,7 +48,7 @@
         </nav>
 
         <!-- Main Content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 p-0">
+        <main class="col-md-9 ms-sm-auto col-lg-10 p-0 d-flex flex-column min-vh-100">
             <header class="navbar sticky-top bg-white flex-md-nowrap p-2 shadow-sm border-bottom">
                 <div class="d-flex align-items-center gap-3 px-3">
                     <img src="{{ asset('images/logo.jpeg') }}" alt="Lohana Logo" style="height: 50px; width: auto;" class="rounded shadow-sm">
@@ -60,7 +60,7 @@
                 </button>
             </header>
 
-            <div class="main-content">
+            <div class="main-content flex-grow-1">
                 @if(session('success'))
                     <div class="alert alert-success alert-dismissible fade show animate__animated animate__fadeInDown" role="alert">
                         <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
@@ -82,6 +82,24 @@
 
                 @yield('content')
             </div>
+
+            <!-- Copyright Footer -->
+            <footer class="footer py-3 bg-white border-top mt-auto">
+                <div class="container-fluid px-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-6 text-center text-md-start">
+                            <p class="mb-0 text-muted footer-text">
+                                &copy; {{ date('Y') }} <span class="text-maroon fw-bold">શ્રી ઘોઘારી લોહાણા મહાજન - સુરત</span>. સર્વ હક સ્વાધીન.
+                            </p>
+                        </div>
+                        <div class="col-md-6 text-center text-md-end mt-2 mt-md-0">
+                            <span class="text-muted small footer-tagline">
+                                Developed by <a href="https://ziuinfotech.in/" target="_blank" class="text-maroon fw-bold text-decoration-none">ZIU INFOTECH</a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </footer>
         </main>
     </div>
 </div>

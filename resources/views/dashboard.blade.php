@@ -59,7 +59,9 @@
                             <button class="btn btn-maroon" type="submit">શોધો</button>
                         </div>
                         @if(request('search'))
-                            <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary member-clear-btn">ક્લિયર</a>
+                            <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary member-clear-btn d-flex align-items-center gap-2">
+                                <i class="bi bi-x-circle"></i> ક્લિયર
+                            </a>
                         @endif
                     </form>
                 </div>

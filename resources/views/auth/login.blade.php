@@ -138,8 +138,12 @@
                 <label class="form-check-label small text-muted" for="remember">મને યાદ રાખો</label>
             </div>
             
-            <button type="submit" class="btn btn-primary w-100 py-3">લોગિન કરો</button>
+        <button type="submit" class="btn btn-primary w-100 py-3">લોગિન કરો</button>
         </form>
+    </div>
+    <div class="mt-4 text-center text-muted small animate__animated animate__fadeInUp" style="animation-delay: 0.5s;">
+        <p class="mb-0">&copy; {{ date('Y') }} <span class="fw-bold">શ્રી ઘોઘારી લોહાણા મહાજન - સુરત</span></p>
+        <p class="mb-0 opacity-75">સર્વ હક સ્વાધીન. | Developed by <a href="https://ziuinfotech.in/" target="_blank" class="text-maroon fw-bold text-decoration-none">ZIU INFOTECH</a></p>
     </div>
 </div>
 

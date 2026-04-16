@@ -22,7 +22,7 @@
     <div class="card-body p-0">
         <div class="p-4 bg-soft-maroon border-bottom">
             <form action="{{ route('members.index') }}" method="GET" class="row g-3">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div class="input-group">
                         <span class="input-group-text bg-white border-end-0">
                             <i class="bi bi-search text-maroon"></i>
@@ -31,10 +31,12 @@
                         <button class="btn btn-maroon px-4" type="submit">શોધો</button>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="d-flex justify-content-end gap-2">
-                        @if(request('search'))
-                            <a href="{{ route('members.index') }}" class="btn btn-outline-secondary">ફિલ્ટર ક્લિયર કરો</a>
+                <div class="col-md-8">
+                    <div class="d-flex justify-content-end align-items-center gap-2">
+                        @if(request('search') || request('columns'))
+                            <a href="{{ route('members.index') }}" class="btn btn-outline-secondary d-flex align-items-center gap-2 shadow-sm">
+                                <i class="bi bi-x-circle"></i> ફિલ્ટર ક્લિયર કરો
+                            </a>
                         @endif
                         
                         <div class="dropdown">
