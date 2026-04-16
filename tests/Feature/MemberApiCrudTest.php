@@ -16,11 +16,11 @@ test('members can be created through the api', function () {
 
     $response
         ->assertCreated()
-        ->assertJsonPath('data.member_no', 'MM0001')
+        ->assertJsonPath('data.member_no', 'GLS-S-001')
         ->assertJsonPath('data.first_name', 'Trupal');
 
     $this->assertDatabaseHas('members', [
-        'member_no' => 'MM0001',
+        'member_no' => 'GLS-S-001',
         'first_name' => 'Trupal',
         'is_main' => true,
     ]);
@@ -28,26 +28,26 @@ test('members can be created through the api', function () {
 
 test('members can be shown through the api', function () {
     $member = createMainMember([
-        'member_no' => 'MM0001',
+        'member_no' => 'GLS-S-001',
     ]);
 
     createFamilyMember($member, [
-        'member_no' => 'MM0001-01',
+        'member_no' => 'GLS-S-001-1',
         'first_name' => 'Raj',
     ]);
 
-    $this->getJson('/api/members/MM0001')
+    $this->getJson('/api/members/GLS-S-001')
         ->assertSuccessful()
-        ->assertJsonPath('data.member_no', 'MM0001')
-        ->assertJsonPath('data.family_members.0.member_no', 'MM0001-01');
+        ->assertJsonPath('data.member_no', 'GLS-S-001')
+        ->assertJsonPath('data.family_members.0.member_no', 'GLS-S-001-1');
 });
 
 test('members can be updated through the api', function () {
     $member = createMainMember([
-        'member_no' => 'MM0001',
+        'member_no' => 'GLS-S-001',
     ]);
 
-    $response = $this->putJson('/api/members/MM0001', memberPayload([
+    $response = $this->putJson('/api/members/GLS-S-001', memberPayload([
         'first_name' => 'Updated',
         'mobile' => '9999999999',
         'email' => 'updated@example.com',
@@ -67,50 +67,50 @@ test('members can be updated through the api', function () {
 
 test('members can be deleted through the api', function () {
     createMainMember([
-        'member_no' => 'MM0001',
+        'member_no' => 'GLS-S-001',
     ]);
 
-    $this->deleteJson('/api/members/MM0001')
+    $this->deleteJson('/api/members/GLS-S-001')
         ->assertSuccessful()
         ->assertJsonPath('message', 'Member deleted successfully');
 
     $this->assertDatabaseMissing('members', [
-        'member_no' => 'MM0001',
+        'member_no' => 'GLS-S-001',
     ]);
 });
 
 test('family members can be created and shown through the api', function () {
     $member = createMainMember([
-        'member_no' => 'MM0001',
+        'member_no' => 'GLS-S-001',
     ]);
 
-    $storeResponse = $this->postJson('/api/members/MM0001/family-members', familyPayload([
+    $storeResponse = $this->postJson('/api/members/GLS-S-001/family-members', familyPayload([
         'first_name' => 'Raj',
         'mobile' => '9090909091',
     ]));
 
     $storeResponse
         ->assertCreated()
-        ->assertJsonPath('data.member_no', 'MM0001-01')
+        ->assertJsonPath('data.member_no', 'GLS-S-001-1')
         ->assertJsonPath('data.first_name', 'Raj');
 
-    $this->getJson('/api/members/MM0001/family-members/MM0001-01')
+    $this->getJson('/api/members/GLS-S-001/family-members/GLS-S-001-1')
         ->assertSuccessful()
-        ->assertJsonPath('data.member_no', 'MM0001-01')
+        ->assertJsonPath('data.member_no', 'GLS-S-001-1')
         ->assertJsonPath('data.parent_id', $member->id);
 });
 
 test('family members can be updated and deleted through the api', function () {
     $member = createMainMember([
-        'member_no' => 'MM0001',
+        'member_no' => 'GLS-S-001',
     ]);
 
     createFamilyMember($member, [
-        'member_no' => 'MM0001-01',
+        'member_no' => 'GLS-S-001-1',
         'first_name' => 'Raj',
     ]);
 
-    $this->putJson('/api/members/MM0001/family-members/MM0001-01', familyPayload([
+    $this->putJson('/api/members/GLS-S-001/family-members/GLS-S-001-1', familyPayload([
         'first_name' => 'Regina',
         'mobile' => '9090909092',
     ]))
@@ -118,12 +118,12 @@ test('family members can be updated and deleted through the api', function () {
         ->assertJsonPath('data.first_name', 'Regina')
         ->assertJsonPath('data.mobile', '9090909092');
 
-    $this->deleteJson('/api/members/MM0001/family-members/MM0001-01')
+    $this->deleteJson('/api/members/GLS-S-001/family-members/GLS-S-001-1')
         ->assertSuccessful()
         ->assertJsonPath('message', 'Family member deleted successfully.');
 
     $this->assertDatabaseMissing('members', [
-        'member_no' => 'MM0001-01',
+        'member_no' => 'GLS-S-001-1',
     ]);
 });
 
@@ -173,7 +173,7 @@ function familyPayload(array $overrides = []): array
 function createMainMember(array $overrides = []): Member
 {
     return Member::create(array_merge(memberPayload(), [
-        'member_no' => 'MM9999',
+        'member_no' => 'GLS-S-999',
         'is_main' => true,
         'parent_id' => null,
     ], $overrides));
@@ -182,7 +182,7 @@ function createMainMember(array $overrides = []): Member
 function createFamilyMember(Member $member, array $overrides = []): Member
 {
     return Member::create(array_merge(familyPayload(), [
-        'member_no' => $member->member_no.'-01',
+        'member_no' => $member->member_no.'-1',
         'is_main' => false,
         'parent_id' => $member->id,
     ], $overrides));

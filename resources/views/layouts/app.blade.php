@@ -17,41 +17,45 @@
     <div class="row">
         <!-- Sidebar -->
         <nav class="col-md-3 col-lg-2 d-md-block sidebar p-0">
-            <div class="position-sticky pt-3">
-                <div class="px-3 mb-4 text-center">
-                    <h4 class="text-white fw-bold mb-1">ટ્રસ્ટ મેનેજમેન્ટ</h4>
-                    <div style="height: 2px; width: 50px; background: var(--gold-accent); margin: 5px auto;"></div>
+            <div class="d-flex flex-column h-100">
+                <div class="px-3 mb-4 mt-3">
+                    <div class="text-white fw-bold">નમસ્તે, {{ Auth::user()->name }}</div>
+                    <hr class="text-white-50 opacity-25">
                 </div>
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
-                            <i class="bi bi-speedometer2 me-2"></i> ડેશબોર્ડ
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('members.*') ? 'active' : '' }}" href="{{ route('members.index') }}">
-                            <i class="bi bi-people me-2"></i> સભ્યો
-                        </a>
-                    </li>
-                    <li class="nav-item mt-4">
-                        <form action="{{ route('logout') }}" method="POST">
-                            @csrf
-                            <button type="submit" class="nav-link border-0 bg-transparent w-100 text-start">
-                                <i class="bi bi-box-arrow-right me-2"></i> લોગ આઉટ
-                            </button>
-                        </form>
-                    </li>
-                </ul>
+                <div class="flex-grow-1 overflow-y-auto">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
+                                <i class="bi bi-speedometer2 me-2"></i> ડેશબોર્ડ
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('members.*') ? 'active' : '' }}" href="{{ route('members.index') }}">
+                                <i class="bi bi-people me-2"></i> સભ્યો
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="mt-auto px-3 pb-4 pt-3 border-top border-white-10">
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="nav-link border-0 bg-transparent w-100 text-start text-white-50 p-0">
+                            <i class="bi bi-box-arrow-right me-2"></i> લોગ આઉટ
+                        </button>
+                    </form>
+                </div>
             </div>
         </nav>
 
         <!-- Main Content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 p-0">
-            <header class="navbar sticky-top bg-white flex-md-nowrap p-3 shadow-sm">
-                <div class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6">
-                    નમસ્તે, {{ Auth::user()->name }}
+            <header class="navbar sticky-top bg-white flex-md-nowrap p-2 shadow-sm border-bottom">
+                <div class="d-flex align-items-center gap-3 px-3">
+                    <img src="{{ asset('images/logo.jpeg') }}" alt="Lohana Logo" style="height: 50px; width: auto;" class="rounded shadow-sm">
+                    <h5 class="mb-0 text-maroon fw-bold d-none d-md-block">શ્રી ઘોઘારી લોહાણા મહાજન - સુરત</h5>
                 </div>
-                <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target=".sidebar" aria-controls="sidebar" aria-expanded="false" aria-label="Toggle navigation">
+               
+                <button class="navbar-toggler position-absolute d-md-none collapsed end-0 me-3" type="button" data-bs-toggle="collapse" data-bs-target=".sidebar" aria-controls="sidebar" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
             </header>

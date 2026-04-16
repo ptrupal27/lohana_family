@@ -10,7 +10,10 @@
     </nav>
     <div class="d-flex justify-content-between align-items-center">
         <h2>સભ્યની વિગતો</h2>
-        <div>
+        <div class="d-flex gap-2">
+            <a href="{{ route('members.print.single', $member) }}" target="_blank" class="btn btn-outline-dark">
+                <i class="bi bi-printer me-2"></i> પ્રિન્ટ
+            </a>
             <a href="{{ route('members.edit', $member) }}" class="btn btn-primary">
                 <i class="bi bi-pencil me-2"></i> એડિટ કરો
             </a>
@@ -31,9 +34,8 @@
                     </div>
                 @endif
                 </div>
-                <h4 class="fw-bold" data-member-field="full_name">{{ $member->first_name }} {{ $member->middle_name }} {{ $member->last_name }}</h4>
+                <h4 class="fw-bold text-maroon" data-member-field="full_name">{{ $member->first_name }} {{ $member->middle_name }} {{ $member->last_name }}</h4>
                 <div class="mb-2">
-                    <span class="badge bg-primary px-3 py-2 rounded-pill">મુખ્ય સભ્ય</span>
                     <span class="badge bg-soft-maroon text-maroon border px-3 py-2 rounded-pill" data-member-field="member_no">{{ $member->member_no }}</span>
                 </div>
                 <p class="text-muted"><i class="bi bi-telephone me-2"></i><span data-member-field="mobile">{{ $member->mobile }}</span></p>
@@ -110,14 +112,14 @@
                                     <td>{{ \Carbon\Carbon::parse($family->date_of_birth)->format('d/m/Y') }}</td>
                                     <td>{{ $family->mobile ?? '-' }}</td>
                                     <td class="text-end">
-                                        <div class="btn-group">
-                                            <a href="{{ route('family-members.edit', [$member, $family]) }}" class="btn btn-sm btn-outline-primary border-0">
+                                        <div class="d-flex justify-content-end gap-1">
+                                            <a href="{{ route('family-members.edit', [$member, $family]) }}" class="btn btn-icon btn-edit" title="એડિટ">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
-                                            <form action="{{ route('family-members.destroy', [$member, $family]) }}" method="POST" onsubmit="return confirm('શું તમે ખરેખર આ સભ્યને કાઢી નાખવા માંગો છો?')">
+                                            <form action="{{ route('api.members.family-members.destroy', [$member, $family]) }}" method="POST" class="d-inline" data-api-delete-form data-api-url="{{ route('api.members.family-members.destroy', [$member, $family]) }}" data-reload="true">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-outline-danger border-0">
+                                                <button type="submit" class="btn btn-icon btn-delete" title="ડિલીટ">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </form>
@@ -141,7 +143,7 @@
 <div class="modal fade" id="addFamilyMemberModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content border-0 shadow">
-            <form action="{{ route('family-members.store', $member) }}" method="POST" enctype="multipart/form-data" data-api-form data-api-url="{{ route('api.members.family-members.store', $member) }}" data-reload="true">
+            <form action="{{ route('api.members.family-members.store', $member) }}" method="POST" enctype="multipart/form-data" data-api-form data-api-url="{{ route('api.members.family-members.store', $member) }}" data-reload="true">
                 @csrf
                 <div class="modal-header bg-success text-white">
                     <h5 class="modal-title fw-bold">પરિવારના સભ્ય ઉમેરો</h5>
@@ -240,3 +242,4 @@
     }
 </script>
 @endsection
+

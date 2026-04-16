@@ -2,10 +2,18 @@
 
 namespace App\Http\Requests;
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 
 class FamilyMemberRequest extends FormRequest
 {
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'date_of_birth' => $this->normalizeDateValue($this->input('date_of_birth')),
+        ]);
+    }
+
     public function authorize(): bool
     {
         return true;
@@ -45,5 +53,25 @@ class FamilyMemberRequest extends FormRequest
             'date_of_birth.required' => 'જન્મ તારીખ જરૂરી છે.',
             'relation.required' => 'સંબંધ જરૂરી છે.',
         ];
+    }
+
+    private function normalizeDateValue(mixed $date): mixed
+    {
+        if (! is_string($date) || $date === '') {
+            return $date;
+        }
+
+        $normalizedDate = trim(str_replace('/', '-', $date));
+        $formats = ['Y-m-d', 'd-m-Y', 'm-d-Y'];
+
+        foreach ($formats as $format) {
+            try {
+                return Carbon::createFromFormat($format, $normalizedDate)->format('Y-m-d');
+            } catch (\Throwable $exception) {
+                // Try next format.
+            }
+        }
+
+        return $date;
     }
 }

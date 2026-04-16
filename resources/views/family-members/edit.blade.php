@@ -13,7 +13,7 @@
 
 <div class="card shadow-sm border-0">
     <div class="card-body">
-        <form action="{{ route('family-members.update', [$member, $familyMember]) }}" method="POST" enctype="multipart/form-data" data-api-form data-api-url="{{ route('api.members.family-members.update', [$member, $familyMember]) }}" data-api-method="PUT" data-redirect-url="{{ route('members.show', $member) }}">
+        <form action="{{ route('api.members.family-members.update', [$member, $familyMember]) }}" method="POST" enctype="multipart/form-data" data-api-form data-api-url="{{ route('api.members.family-members.update', [$member, $familyMember]) }}" data-api-method="PUT" data-redirect-url="{{ route('members.show', $member) }}">
             @csrf
             @method('PUT')
             

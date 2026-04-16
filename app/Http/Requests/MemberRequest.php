@@ -2,10 +2,33 @@
 
 namespace App\Http\Requests;
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 
 class MemberRequest extends FormRequest
 {
+    protected function prepareForValidation(): void
+    {
+        $family = $this->input('family', []);
+
+        if (is_array($family)) {
+            $family = array_map(function (mixed $familyMember): mixed {
+                if (! is_array($familyMember)) {
+                    return $familyMember;
+                }
+
+                $familyMember['date_of_birth'] = $this->normalizeDateValue($familyMember['date_of_birth'] ?? null);
+
+                return $familyMember;
+            }, $family);
+        }
+
+        $this->merge([
+            'date_of_birth' => $this->normalizeDateValue($this->input('date_of_birth')),
+            'family' => $family,
+        ]);
+    }
+
     public function authorize(): bool
     {
         return true;
@@ -74,5 +97,25 @@ class MemberRequest extends FormRequest
             'photo.image' => 'ફાઇલ ફોટો હોવી જોઈએ.',
             'photo.max' => 'ફોટો 2MB થી મોટો ન હોવો જોઈએ.',
         ];
+    }
+
+    private function normalizeDateValue(mixed $date): mixed
+    {
+        if (! is_string($date) || $date === '') {
+            return $date;
+        }
+
+        $normalizedDate = trim(str_replace('/', '-', $date));
+        $formats = ['Y-m-d', 'd-m-Y', 'm-d-Y'];
+
+        foreach ($formats as $format) {
+            try {
+                return Carbon::createFromFormat($format, $normalizedDate)->format('Y-m-d');
+            } catch (\Throwable $exception) {
+                // Try next format.
+            }
+        }
+
+        return $date;
     }
 }

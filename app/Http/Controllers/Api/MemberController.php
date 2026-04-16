@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\FamilyMemberRequest;
 use App\Http\Requests\MemberRequest;
 use App\Http\Resources\MemberResource;
 use App\Models\Member;
@@ -41,9 +42,7 @@ class MemberController extends Controller
         $mainMember = DB::transaction(function () use ($request, $data) {
             $data['is_main'] = true;
 
-            $lastMainMember = Member::where('is_main', true)->latest('id')->first();
-            $nextId = ($lastMainMember ? (int) str_replace('MM', '', $lastMainMember->member_no) : 0) + 1;
-            $data['member_no'] = 'MM'.str_pad($nextId, 4, '0', STR_PAD_LEFT);
+            $data['member_no'] = Member::generateNextMainMemberNo();
 
             if ($request->hasFile('photo')) {
                 $data['photo'] = $request->file('photo')->store('members', 'public');
@@ -52,14 +51,12 @@ class MemberController extends Controller
             $member = Member::create(Arr::except($data, ['family']));
 
             if ($request->has('family')) {
-                $subIndex = 1;
                 foreach ($request->family as $familyData) {
                     $familyData['is_main'] = false;
                     $familyData['parent_id'] = $member->id;
-                    $familyData['member_no'] = $member->member_no.'-'.str_pad($subIndex, 2, '0', STR_PAD_LEFT);
+                    $familyData['member_no'] = $member->generateNextFamilyMemberNo();
 
                     Member::create($familyData);
-                    $subIndex++;
                 }
             }
 
@@ -93,9 +90,6 @@ class MemberController extends Controller
             $member->update(Arr::except($data, ['family', 'id']));
 
             if ($request->has('family')) {
-                $existingCount = $member->children()->count();
-                $subIndex = $existingCount + 1;
-
                 foreach ($request->family as $familyData) {
                     if (isset($familyData['id'])) {
                         $child = Member::findOrFail($familyData['id']);
@@ -103,10 +97,9 @@ class MemberController extends Controller
                     } else {
                         $familyData['is_main'] = false;
                         $familyData['parent_id'] = $member->id;
-                        $familyData['member_no'] = $member->member_no.'-'.str_pad($subIndex, 2, '0', STR_PAD_LEFT);
+                        $familyData['member_no'] = $member->generateNextFamilyMemberNo();
 
                         Member::create($familyData);
-                        $subIndex++;
                     }
                 }
             }
@@ -123,5 +116,76 @@ class MemberController extends Controller
         $member->delete();
 
         return response()->json(['message' => 'Member deleted successfully']);
+    }
+
+    public function storeFamilyMember(FamilyMemberRequest $request, Member $member): JsonResponse
+    {
+        abort_unless($member->is_main, 404);
+
+        $data = $request->validated();
+
+        if ($request->hasFile('photo')) {
+            $data['photo'] = $request->file('photo')->store('members', 'public');
+        }
+
+        $data['member_no'] = $member->generateNextFamilyMemberNo();
+        $data['is_main'] = false;
+        $data['parent_id'] = $member->id;
+        $data['family_no'] = $member->family_no;
+
+        $familyMember = Member::create($data);
+
+        return (new MemberResource($familyMember))
+            ->response()
+            ->setStatusCode(201);
+    }
+
+    public function showFamilyMember(Member $member, Member $familyMember): MemberResource
+    {
+        $this->ensureFamilyMemberBelongsToMember($member, $familyMember);
+
+        return new MemberResource($familyMember);
+    }
+
+    public function updateFamilyMember(FamilyMemberRequest $request, Member $member, Member $familyMember): MemberResource
+    {
+        $this->ensureFamilyMemberBelongsToMember($member, $familyMember);
+
+        $data = $request->validated();
+
+        if ($request->hasFile('photo')) {
+            if ($familyMember->photo) {
+                Storage::disk('public')->delete($familyMember->photo);
+            }
+
+            $data['photo'] = $request->file('photo')->store('members', 'public');
+        }
+
+        $familyMember->update($data);
+
+        return new MemberResource($familyMember->fresh());
+    }
+
+    public function destroyFamilyMember(Member $member, Member $familyMember): JsonResponse
+    {
+        $this->ensureFamilyMemberBelongsToMember($member, $familyMember);
+
+        if ($familyMember->photo) {
+            Storage::disk('public')->delete($familyMember->photo);
+        }
+
+        $familyMember->delete();
+
+        return response()->json([
+            'message' => 'Family member deleted successfully.',
+        ]);
+    }
+
+    private function ensureFamilyMemberBelongsToMember(Member $member, Member $familyMember): void
+    {
+        abort_unless(
+            $member->is_main && ! $familyMember->is_main && $familyMember->parent_id === $member->id,
+            404
+        );
     }
 }

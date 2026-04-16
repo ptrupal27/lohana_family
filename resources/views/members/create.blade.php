@@ -38,15 +38,20 @@
         </div>
     </div>
 
-    <form action="{{ route('members.store') }}" method="POST" enctype="multipart/form-data" id="wizardForm" novalidate data-api-form data-api-url="{{ route('api.members.store') }}" data-redirect-template="{{ route('members.show', '__MEMBER__') }}">
+    <form action="{{ route('api.members.store') }}" method="POST" enctype="multipart/form-data" id="wizardForm" novalidate data-api-form data-api-url="{{ route('api.members.store') }}" data-redirect-template="{{ route('members.show', '__MEMBER__') }}">
         @csrf
         
         <div class="tab-content" id="memberTabsContent">
             <!-- Main Member Pane -->
             <div class="tab-pane fade show active p-5" id="main-pane" role="tabpanel">
+                <div class="member-form-note">
+                    <i class="bi bi-info-circle me-1"></i>
+                    <strong>નોંધ:</strong> * વાળા બધા વિગત જરૂરી છે. પરિવાર ઉમેરવો હોય તો ઉપર <strong>પરિવાર ઉમેરો</strong> પસંદ કરો.
+                </div>
                 <div class="row g-4">
                     <div class="col-md-12">
-                        <h4 class="text-maroon border-start border-5 border-maroon ps-3 fw-bold mb-4">મુખ્ય સભ્યની વિગતો</h4>
+                        <h4 class="member-section-title">મુખ્ય સભ્યની વિગતો</h4>
+                        <p class="member-section-subtitle">વ્યક્તિગત, સંપર્ક અને સરનામાની માહિતી ભરો.</p>
                     </div>
 
                     <div class="col-md-3">
@@ -77,11 +82,11 @@
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-bold">જન્મ તારીખ <span class="text-danger">*</span></label>
-                        <input type="date" name="date_of_birth" class="form-control form-control-lg bg-light" required>
+                        <input type="date" name="date_of_birth" class="form-control form-control-lg bg-light" max="{{ now()->toDateString() }}" required>
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-bold">મોબાઇલ નંબર <span class="text-danger">*</span></label>
-                        <input type="text" name="mobile" class="form-control form-control-lg bg-light" required>
+                        <input type="text" name="mobile" class="form-control form-control-lg bg-light" placeholder="10 અંકનો નંબર" inputmode="numeric" maxlength="15" required>
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-bold">ઇમેઇલ</label>
@@ -107,7 +112,7 @@
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-bold">પિનકોડ <span class="text-danger">*</span></label>
-                        <input type="text" name="pincode" id="main_pincode" class="form-control form-control-lg bg-light" required>
+                        <input type="text" name="pincode" id="main_pincode" class="form-control form-control-lg bg-light" placeholder="જેમ કે 395010" inputmode="numeric" maxlength="10" required>
                     </div>
 
                     <div class="col-md-4">
@@ -124,7 +129,7 @@
                     </div>
                 </div>
 
-                <div class="mt-5 pt-4 border-top d-flex justify-content-between">
+                <div class="mt-5 pt-4 border-top d-flex justify-content-between member-form-actions">
                     <a href="{{ route('members.index') }}" class="btn btn-lg btn-light px-5 fw-bold">કેન્સલ</a>
                     <div class="wizard-nav-btns">
                         <button type="button" class="btn btn-lg btn-maroon px-5 fw-bold next-btn">આગળ વધો <i class="bi bi-arrow-right ms-2"></i></button>
@@ -138,8 +143,7 @@
 
 <template id="familyFormTemplate">
     <div class="row g-4">
-        <div class="col-md-12 d-flex justify-content-between align-items-center mb-2">
-            <h4 class="text-success border-start border-5 border-success ps-3 fw-bold">પરિવારના સભ્ય - INDEX</h4>
+        <div class="col-md-12 d-flex justify-content-end align-items-center mb-2">
             <div class="d-flex gap-2">
                 <button type="button" class="btn btn-sm btn-outline-info fw-bold" onclick="copyMainAddress(INDEX)">
                     <i class="bi bi-geo-alt-fill me-1"></i> મુખ્ય સરનામું કોપી
@@ -178,11 +182,11 @@
         </div>
         <div class="col-md-3">
             <label class="form-label fw-bold">જન્મ તારીખ <span class="text-danger">*</span></label>
-            <input type="date" name="family[INDEX][date_of_birth]" class="form-control form-control-lg bg-light" required>
+            <input type="date" name="family[INDEX][date_of_birth]" class="form-control form-control-lg bg-light" max="{{ now()->toDateString() }}" required>
         </div>
         <div class="col-md-3">
             <label class="form-label fw-bold">મોબાઇલ નંબર</label>
-            <input type="text" name="family[INDEX][mobile]" class="form-control form-control-lg bg-light">
+            <input type="text" name="family[INDEX][mobile]" class="form-control form-control-lg bg-light" placeholder="10 અંકનો નંબર" inputmode="numeric" maxlength="15">
         </div>
         <div class="col-md-3">
             <label class="form-label fw-bold">વ્યવસાય</label>
@@ -208,11 +212,11 @@
         </div>
         <div class="col-md-3">
             <label class="form-label fw-bold">પિનકોડ <span class="text-danger">*</span></label>
-            <input type="text" name="family[INDEX][pincode]" id="pincode_INDEX" class="form-control form-control-lg bg-light" required>
+            <input type="text" name="family[INDEX][pincode]" id="pincode_INDEX" class="form-control form-control-lg bg-light" placeholder="જેમ કે 395010" inputmode="numeric" maxlength="10" required>
         </div>
     </div>
 
-    <div class="mt-5 pt-4 border-top d-flex justify-content-between">
+    <div class="mt-5 pt-4 border-top d-flex justify-content-between member-form-actions">
         <button type="button" class="btn btn-lg btn-light px-5 fw-bold prev-btn"><i class="bi bi-arrow-left me-2"></i> પાછળ</button>
         <div class="wizard-nav-btns">
             <button type="button" class="btn btn-lg btn-maroon px-5 fw-bold next-btn">આગળ વધો <i class="bi bi-arrow-right ms-2"></i></button>
@@ -227,6 +231,27 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 <script>
     let familyCount = 0;
+
+    function bindFamilyNamePreview(paneElement, index) {
+        const firstNameInput = paneElement.querySelector(`input[name="family[${index}][first_name]"]`);
+        const lastNameInput = paneElement.querySelector(`input[name="family[${index}][last_name]"]`);
+        const tabLabel = document.querySelector(`#family-tab-${index} .family-tab-name`);
+
+        if (!firstNameInput || !lastNameInput || !tabLabel) {
+            return;
+        }
+
+        const updateTabName = () => {
+            const firstName = firstNameInput.value.trim();
+            const lastName = lastNameInput.value.trim();
+            const fullName = `${firstName} ${lastName}`.trim();
+            tabLabel.textContent = fullName || 'નામ ભરો';
+        };
+
+        firstNameInput.addEventListener('input', updateTabName);
+        lastNameInput.addEventListener('input', updateTabName);
+        updateTabName();
+    }
 
     document.addEventListener('click', function(e) {
         const nextBtn = e.target.closest('.next-btn');
@@ -308,7 +333,7 @@
             const newTab = document.createElement('li');
             newTab.className = 'nav-item';
             newTab.role = 'presentation';
-            newTab.innerHTML = `<button class="nav-link fw-bold" id="${tabId}" data-bs-toggle="tab" data-bs-target="#${paneId}" type="button" role="tab"><span class="step-num">${familyCount + 1}</span> સભ્ય ${familyCount}</button>`;
+            newTab.innerHTML = `<button class="nav-link fw-bold" id="${tabId}" data-bs-toggle="tab" data-bs-target="#${paneId}" type="button" role="tab"><span class="step-num">${familyCount + 1}</span> <span class="family-tab-name">નામ ભરો</span></button>`;
             tabList.appendChild(newTab);
 
             const newPane = document.createElement('div');
@@ -324,6 +349,7 @@
             
             newPane.innerHTML = html;
             tabContent.appendChild(newPane);
+            bindFamilyNamePreview(newPane, familyCount);
         }
 
         toggleFamilyInput();
