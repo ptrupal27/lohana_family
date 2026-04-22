@@ -3,12 +3,11 @@
 use App\Models\Member;
 use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-use Laravel\Sanctum\Sanctum;
 
 uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
-    Sanctum::actingAs(User::factory()->create(), ['*']);
+    $this->actingAs(User::factory()->create());
 });
 
 test('members can be created through the api', function () {
@@ -72,7 +71,7 @@ test('members can be deleted through the api', function () {
 
     $this->deleteJson('/api/members/GLS-S-001')
         ->assertSuccessful()
-        ->assertJsonPath('message', 'Member deleted successfully');
+        ->assertJsonPath('message', 'સભ્ય સફળતાપૂર્વક કાઢી નાખવામાં આવ્યા છે.');
 
     $this->assertDatabaseMissing('members', [
         'member_no' => 'GLS-S-001',
@@ -84,9 +83,10 @@ test('family members can be created and shown through the api', function () {
         'member_no' => 'GLS-S-001',
     ]);
 
-    $storeResponse = $this->postJson('/api/members/GLS-S-001/family-members', familyPayload([
+    $storeResponse = $this->postJson("/api/members/{$member->member_no}/family-members", familyPayload([
         'first_name' => 'Raj',
         'mobile' => '9090909091',
+        'member_no' => 'GLS-S-001-1',
     ]));
 
     $storeResponse
@@ -94,7 +94,7 @@ test('family members can be created and shown through the api', function () {
         ->assertJsonPath('data.member_no', 'GLS-S-001-1')
         ->assertJsonPath('data.first_name', 'Raj');
 
-    $this->getJson('/api/members/GLS-S-001/family-members/GLS-S-001-1')
+    $this->getJson("/api/members/{$member->member_no}/family-members/GLS-S-001-1")
         ->assertSuccessful()
         ->assertJsonPath('data.member_no', 'GLS-S-001-1')
         ->assertJsonPath('data.parent_id', $member->id);
@@ -105,12 +105,13 @@ test('family members can be updated and deleted through the api', function () {
         'member_no' => 'GLS-S-001',
     ]);
 
-    createFamilyMember($member, [
+    $familyMember = createFamilyMember($member, [
         'member_no' => 'GLS-S-001-1',
         'first_name' => 'Raj',
     ]);
 
-    $this->putJson('/api/members/GLS-S-001/family-members/GLS-S-001-1', familyPayload([
+    $this->putJson("/api/members/{$member->member_no}/family-members/{$familyMember->member_no}", familyPayload([
+        'member_no' => 'GLS-S-001-1',
         'first_name' => 'Regina',
         'mobile' => '9090909092',
     ]))
@@ -118,9 +119,9 @@ test('family members can be updated and deleted through the api', function () {
         ->assertJsonPath('data.first_name', 'Regina')
         ->assertJsonPath('data.mobile', '9090909092');
 
-    $this->deleteJson('/api/members/GLS-S-001/family-members/GLS-S-001-1')
+    $this->deleteJson("/api/members/{$member->member_no}/family-members/{$familyMember->member_no}")
         ->assertSuccessful()
-        ->assertJsonPath('message', 'Family member deleted successfully.');
+        ->assertJsonPath('message', 'પરિવારના સભ્ય સફળતાપૂર્વક કાઢી નાખવામાં આવ્યા છે.');
 
     $this->assertDatabaseMissing('members', [
         'member_no' => 'GLS-S-001-1',
@@ -130,6 +131,7 @@ test('family members can be updated and deleted through the api', function () {
 function memberPayload(array $overrides = []): array
 {
     return array_merge([
+        'member_no' => 'GLS-S-001',
         'first_name' => 'Trupal',
         'middle_name' => 'Ashvin',
         'mother_name' => 'Paul Bernard',
@@ -151,6 +153,7 @@ function memberPayload(array $overrides = []): array
 function familyPayload(array $overrides = []): array
 {
     return array_merge([
+        'member_no' => 'GLS-S-001-1',
         'first_name' => 'Raj',
         'middle_name' => 'Trupal',
         'mother_name' => 'Paul Bernard',

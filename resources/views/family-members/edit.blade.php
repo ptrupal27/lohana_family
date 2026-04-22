@@ -23,6 +23,18 @@
                 </div>
                 
                 <div class="col-md-3 mb-3">
+                    <label class="form-label">પરિવાર નંબર</label>
+                    <input type="text" name="family_no" class="form-control" value="{{ old('family_no', $familyMember->family_no) }}">
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">સભ્ય નંબર <span class="text-danger">*</span></label>
+                    <input type="text" name="member_no" class="form-control" value="{{ old('member_no', $familyMember->member_no) }}" required>
+                </div>
+
+                <div class="col-md-6 mb-3"></div>
+
+                <div class="col-md-3 mb-3">
                     <label class="form-label">નામ <span class="text-danger">*</span></label>
                     <input type="text" name="first_name" class="form-control" value="{{ old('first_name', $familyMember->first_name) }}" required>
                 </div>
@@ -55,6 +67,21 @@
                         <option value="Other" {{ old('gender', $familyMember->gender) == 'Other' ? 'selected' : '' }}>અન્ય</option>
                     </select>
                 </div>
+                
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">બ્લડ ગ્રુપ</label>
+                    <select name="blood_group" class="form-select">
+                        <option value="">પસંદ કરો</option>
+                        <option value="A+" {{ old('blood_group', $familyMember->blood_group) == 'A+' ? 'selected' : '' }}>A+</option>
+                        <option value="A-" {{ old('blood_group', $familyMember->blood_group) == 'A-' ? 'selected' : '' }}>A-</option>
+                        <option value="B+" {{ old('blood_group', $familyMember->blood_group) == 'B+' ? 'selected' : '' }}>B+</option>
+                        <option value="B-" {{ old('blood_group', $familyMember->blood_group) == 'B-' ? 'selected' : '' }}>B-</option>
+                        <option value="AB+" {{ old('blood_group', $familyMember->blood_group) == 'AB+' ? 'selected' : '' }}>AB+</option>
+                        <option value="AB-" {{ old('blood_group', $familyMember->blood_group) == 'AB-' ? 'selected' : '' }}>AB-</option>
+                        <option value="O+" {{ old('blood_group', $familyMember->blood_group) == 'O+' ? 'selected' : '' }}>O+</option>
+                        <option value="O-" {{ old('blood_group', $familyMember->blood_group) == 'O-' ? 'selected' : '' }}>O-</option>
+                    </select>
+                </div>
 
                 <div class="col-md-3 mb-3">
                     <label class="form-label">જન્મ તારીખ <span class="text-danger">*</span></label>
@@ -63,7 +90,7 @@
 
                 <div class="col-md-3 mb-3">
                     <label class="form-label">મોબાઇલ નંબર</label>
-                    <input type="text" name="mobile" class="form-control" value="{{ old('mobile', $familyMember->mobile) }}">
+                    <input type="number" name="mobile" class="form-control" value="{{ old('mobile', $familyMember->mobile) }}" oninput="if(this.value.length > 10) this.value = this.value.slice(0, 10);">
                 </div>
 
                 <div class="col-md-12 mb-4 mt-3">
@@ -92,12 +119,22 @@
 
                 <div class="col-md-3 mb-3">
                     <label class="form-label">પિનકોડ <span class="text-danger">*</span></label>
-                    <input type="text" name="pincode" class="form-control" value="{{ old('pincode', $familyMember->pincode) }}" required>
+                    <input type="number" name="pincode" class="form-control" value="{{ old('pincode', $familyMember->pincode) }}" required>
                 </div>
 
                 <div class="col-md-4 mb-3">
                     <label class="form-label">વ્યવસાય</label>
                     <input type="text" name="occupation" class="form-control" value="{{ old('occupation', $familyMember->occupation) }}">
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">ફોટો</label>
+                    <div class="d-flex align-items-center">
+                        <input type="file" name="photo" class="form-control" accept="image/*">
+                        @if($familyMember->photo)
+                            <img src="{{ asset('storage/'.$familyMember->photo) }}" width="40" class="img-thumbnail ms-2 mb-1">
+                        @endif
+                    </div>
                 </div>
 
                 <div class="col-md-4 mb-3">

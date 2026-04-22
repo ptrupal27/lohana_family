@@ -1,49 +1,54 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="mb-4 d-flex justify-content-between align-items-center">
+<div class="mb-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
     <div>
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('members.index') }}">સભ્યોની યાદી</a></li>
-                <li class="breadcrumb-item active" aria-current="page">નવો સભ્ય ઉમેરો</li>
+        <nav aria-label="breadcrumb" class="d-none d-md-block">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item small"><a href="{{ route('members.index') }}">સભ્યોની યાદી</a></li>
+                <li class="breadcrumb-item small active" aria-current="page">નવો સભ્ય ઉમેરો</li>
             </ol>
         </nav>
-        <h2 class="fw-bold text-maroon">સભ્ય રજીસ્ટ્રેશન</h2>
+        <h2 class="fw-bold text-maroon mb-0">સભ્ય રજીસ્ટ્રેશન</h2>
     </div>
 </div>
 
+
 <div class="card shadow-sm border-0 mb-5 overflow-hidden">
-    <div class="card-header bg-white border-bottom-0 p-3 bg-soft-maroon">
-        <div class="d-flex justify-content-between align-items-center">
-            <ul class="nav nav-pills custom-wizard-tabs" id="memberTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active fw-bold" id="main-tab" data-bs-toggle="tab" data-bs-target="#main-pane" type="button" role="tab">
-                        <span class="step-num">1</span> મુખ્ય સભ્ય
-                    </button>
-                </li>
-            </ul>
-            <div class="d-flex align-items-center gap-2">
+    <div class="card-header bg-white border-bottom-0 p-2 p-md-3 bg-soft-maroon">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+            <div class="overflow-x-auto">
+                <ul class="nav nav-pills custom-wizard-tabs flex-nowrap" id="memberTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active fw-bold text-nowrap" id="main-tab" data-bs-toggle="tab" data-bs-target="#main-pane" type="button" role="tab">
+                            <span class="step-num">1</span> મુખ્ય સભ્ય
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="d-flex flex-wrap align-items-center gap-2">
                 <div id="familyCountSection" class="d-none animate__animated animate__fadeIn">
                     <div class="input-group input-group-sm">
-                        <span class="input-group-text bg-white border-maroon border-2 fw-bold">કેટલા સભ્યો ઉમેરવા છે?</span>
-                        <input type="number" id="familyCountInput" class="form-control border-maroon border-2 fw-bold text-center" style="width: 60px;" value="1" min="1">
+                        <span class="input-group-text bg-white border-maroon border-2 fw-bold d-none d-sm-block">કેટલા સભ્યો?</span>
+                        <input type="number" id="familyCountInput" class="form-control border-maroon border-2 fw-bold text-center" style="width: 50px;" value="1" min="1">
                         <button class="btn btn-maroon fw-bold" type="button" onclick="generateFamilyTabs()">ઉમેરો</button>
                     </div>
                 </div>
-                <button type="button" class="btn btn-outline-maroon fw-bold" id="addFamilyBtn" onclick="toggleFamilyInput()">
+                <button type="button" class="btn btn-sm btn-outline-maroon fw-bold" id="addFamilyBtn" onclick="toggleFamilyInput()">
                     <i class="bi bi-people-fill me-1"></i> પરિવાર ઉમેરો
                 </button>
             </div>
         </div>
     </div>
 
+
     <form action="{{ route('api.members.store') }}" method="POST" enctype="multipart/form-data" id="wizardForm" novalidate data-api-form data-api-url="{{ route('api.members.store') }}" data-redirect-template="{{ route('members.show', '__MEMBER__') }}">
         @csrf
         
         <div class="tab-content" id="memberTabsContent">
             <!-- Main Member Pane -->
-            <div class="tab-pane fade show active p-5" id="main-pane" role="tabpanel">
+            <div class="tab-pane fade show active p-3 p-md-5" id="main-pane" role="tabpanel">
+
                 <div class="member-form-note">
                     <i class="bi bi-info-circle me-1"></i>
                     <strong>નોંધ:</strong> * વાળા બધા વિગત જરૂરી છે. પરિવાર ઉમેરવો હોય તો ઉપર <strong>પરિવાર ઉમેરો</strong> પસંદ કરો.
@@ -53,6 +58,16 @@
                         <h4 class="member-section-title">મુખ્ય સભ્યની વિગતો</h4>
                         <p class="member-section-subtitle">વ્યક્તિગત, સંપર્ક અને સરનામાની માહિતી ભરો.</p>
                     </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">પરિવાર નંબર</label>
+                        <input type="text" name="family_no" id="main_family_no" class="form-control form-control-lg bg-light" value="{{ old('family_no') }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">સભ્ય નંબર <span class="text-danger">*</span></label>
+                        <input type="text" name="member_no" class="form-control form-control-lg bg-light" value="{{ old('member_no') }}" required>
+                    </div>
+                    <div class="col-md-6"></div>
 
                     <div class="col-md-3">
                         <label class="form-label fw-bold">નામ <span class="text-danger">*</span></label>
@@ -81,12 +96,30 @@
                         </select>
                     </div>
                     <div class="col-md-3">
+                        <label class="form-label fw-bold">બ્લડ ગ્રુપ</label>
+                        <select name="blood_group" class="form-select form-select-lg bg-light">
+                            <option value="">પસંદ કરો</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
                         <label class="form-label fw-bold">જન્મ તારીખ <span class="text-danger">*</span></label>
                         <input type="date" name="date_of_birth" class="form-control form-control-lg bg-light" max="{{ now()->toDateString() }}" required>
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-bold">મોબાઇલ નંબર <span class="text-danger">*</span></label>
-                        <input type="text" name="mobile" class="form-control form-control-lg bg-light" placeholder="10 અંકનો નંબર" inputmode="numeric" maxlength="15" required>
+                        <input type="number" name="mobile" class="form-control form-control-lg bg-light" placeholder="10 અંકનો નંબર" oninput="if(this.value.length > 10) this.value = this.value.slice(0, 10);" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">બીજો મોબાઇલ નંબર</label>
+                        <input type="number" name="alternate_mobile" class="form-control form-control-lg bg-light" placeholder="વૈકલ્પિક નંબર" oninput="if(this.value.length > 10) this.value = this.value.slice(0, 10);">
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-bold">ઇમેઇલ</label>
@@ -112,7 +145,7 @@
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-bold">પિનકોડ <span class="text-danger">*</span></label>
-                        <input type="text" name="pincode" id="main_pincode" class="form-control form-control-lg bg-light" placeholder="જેમ કે 395010" inputmode="numeric" maxlength="10" required>
+                        <input type="number" name="pincode" id="main_pincode" class="form-control form-control-lg bg-light" placeholder="જેમ કે 395010" required>
                     </div>
 
                     <div class="col-md-4">
@@ -129,13 +162,14 @@
                     </div>
                 </div>
 
-                <div class="mt-5 pt-4 border-top d-flex justify-content-between member-form-actions">
-                    <a href="{{ route('members.index') }}" class="btn btn-lg btn-light px-5 fw-bold">કેન્સલ</a>
-                    <div class="wizard-nav-btns">
-                        <button type="button" class="btn btn-lg btn-maroon px-5 fw-bold next-btn">આગળ વધો <i class="bi bi-arrow-right ms-2"></i></button>
-                        <button type="submit" class="btn btn-lg btn-success px-5 fw-bold submit-btn d-none">રજીસ્ટ્રેશન પૂર્ણ કરો</button>
+                <div class="mt-5 pt-4 border-top d-flex flex-column flex-sm-row justify-content-between gap-3 member-form-actions">
+                    <a href="{{ route('members.index') }}" class="btn btn-lg btn-light px-md-5 fw-bold order-2 order-sm-1">કેન્સલ</a>
+                    <div class="wizard-nav-btns order-1 order-sm-2 d-flex gap-2">
+                        <button type="button" class="btn btn-lg btn-maroon px-md-5 fw-bold next-btn w-100 w-sm-auto">આગળ વધો <i class="bi bi-arrow-right ms-2"></i></button>
+                        <button type="submit" class="btn btn-lg btn-success px-md-5 fw-bold submit-btn d-none w-100 w-sm-auto">રજીસ્ટ્રેશન પૂર્ણ કરો</button>
                     </div>
                 </div>
+
             </div>
         </div>
     </form>
@@ -153,7 +187,15 @@
                 </button>
             </div>
         </div>
-        
+        <div class="col-md-3">
+            <label class="form-label fw-bold">પરિવાર નંબર</label>
+            <input type="text" name="family[INDEX][family_no]" id="family_no_INDEX" class="form-control form-control-lg bg-light">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-bold">સભ્ય નંબર <span class="text-danger">*</span></label>
+            <input type="text" name="family[INDEX][member_no]" class="form-control form-control-lg bg-light" required>
+        </div>
+        <div class="col-md-6"></div>
         <div class="col-md-3">
             <label class="form-label fw-bold">નામ <span class="text-danger">*</span></label>
             <input type="text" name="family[INDEX][first_name]" class="form-control form-control-lg bg-light" required>
@@ -181,16 +223,38 @@
             </select>
         </div>
         <div class="col-md-3">
+            <label class="form-label fw-bold">બ્લડ ગ્રુપ</label>
+            <select name="family[INDEX][blood_group]" class="form-select form-select-lg bg-light">
+                <option value="">પસંદ કરો</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+            </select>
+        </div>
+        <div class="col-md-3">
             <label class="form-label fw-bold">જન્મ તારીખ <span class="text-danger">*</span></label>
             <input type="date" name="family[INDEX][date_of_birth]" class="form-control form-control-lg bg-light" max="{{ now()->toDateString() }}" required>
         </div>
         <div class="col-md-3">
             <label class="form-label fw-bold">મોબાઇલ નંબર</label>
-            <input type="text" name="family[INDEX][mobile]" class="form-control form-control-lg bg-light" placeholder="10 અંકનો નંબર" inputmode="numeric" maxlength="15">
+            <input type="number" name="family[INDEX][mobile]" class="form-control form-control-lg bg-light" placeholder="10 અંકનો નંબર" oninput="if(this.value.length > 10) this.value = this.value.slice(0, 10);">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-bold">બીજો મોબાઇલ નંબર</label>
+            <input type="number" name="family[INDEX][alternate_mobile]" class="form-control form-control-lg bg-light" placeholder="વૈકલ્પિક નંબર" oninput="if(this.value.length > 10) this.value = this.value.slice(0, 10);">
         </div>
         <div class="col-md-3">
             <label class="form-label fw-bold">વ્યવસાય</label>
             <input type="text" name="family[INDEX][occupation]" class="form-control form-control-lg bg-light">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-bold">ફોટો</label>
+            <input type="file" name="family[INDEX][photo]" class="form-control form-control-lg bg-light" accept="image/*">
         </div>
 
         <div class="col-md-12">
@@ -212,17 +276,18 @@
         </div>
         <div class="col-md-3">
             <label class="form-label fw-bold">પિનકોડ <span class="text-danger">*</span></label>
-            <input type="text" name="family[INDEX][pincode]" id="pincode_INDEX" class="form-control form-control-lg bg-light" placeholder="જેમ કે 395010" inputmode="numeric" maxlength="10" required>
+            <input type="number" name="family[INDEX][pincode]" id="pincode_INDEX" class="form-control form-control-lg bg-light" placeholder="જેમ કે 395010" required>
         </div>
     </div>
 
-    <div class="mt-5 pt-4 border-top d-flex justify-content-between member-form-actions">
-        <button type="button" class="btn btn-lg btn-light px-5 fw-bold prev-btn"><i class="bi bi-arrow-left me-2"></i> પાછળ</button>
-        <div class="wizard-nav-btns">
-            <button type="button" class="btn btn-lg btn-maroon px-5 fw-bold next-btn">આગળ વધો <i class="bi bi-arrow-right ms-2"></i></button>
-            <button type="submit" class="btn btn-lg btn-success px-5 fw-bold submit-btn d-none">રજીસ્ટ્રેશન પૂર્ણ કરો</button>
+    <div class="mt-5 pt-4 border-top d-flex flex-column flex-sm-row justify-content-between gap-3 member-form-actions">
+        <button type="button" class="btn btn-lg btn-light px-md-5 fw-bold prev-btn order-2 order-sm-1"><i class="bi bi-arrow-left me-2"></i> પાછળ</button>
+        <div class="wizard-nav-btns order-1 order-sm-2 d-flex gap-2">
+            <button type="button" class="btn btn-lg btn-maroon px-md-5 fw-bold next-btn w-100 w-sm-auto">આગળ વધો <i class="bi bi-arrow-right ms-2"></i></button>
+            <button type="submit" class="btn btn-lg btn-success px-md-5 fw-bold submit-btn d-none w-100 w-sm-auto">રજીસ્ટ્રેશન પૂર્ણ કરો</button>
         </div>
     </div>
+
 </template>
 
 @endsection
@@ -337,9 +402,10 @@
             tabList.appendChild(newTab);
 
             const newPane = document.createElement('div');
-            newPane.className = 'tab-pane fade p-5';
+            newPane.className = 'tab-pane fade p-3 p-md-5';
             newPane.id = paneId;
             newPane.role = 'tabpanel';
+
             
             let html = template;
             html = html.replace(/INDEX/g, familyCount);
@@ -374,7 +440,7 @@
     }
 
     function copyMainAddress(index) {
-        const fields = ['address', 'district', 'sub_district', 'city_village', 'pincode'];
+        const fields = ['address', 'district', 'sub_district', 'city_village', 'pincode', 'family_no'];
         fields.forEach(field => {
             const mainField = document.getElementById(`main_${field}`);
             const familyField = document.getElementById(`${field}_${index}`);

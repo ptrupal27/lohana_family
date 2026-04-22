@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\FamilyMemberRequest;
 use App\Http\Requests\MemberRequest;
+use App\Http\Resources\MemberResource;
 use App\Models\Member;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -25,7 +28,8 @@ class MemberController extends Controller
                     ->orWhere('first_name', 'like', "%{$search}%")
                     ->orWhere('middle_name', 'like', "%{$search}%")
                     ->orWhere('last_name', 'like', "%{$search}%")
-                    ->orWhere('mobile', 'like', "%{$search}%");
+                    ->orWhere('mobile', 'like', "%{$search}%")
+                    ->orWhere('alternate_mobile', 'like', "%{$search}%");
             });
         }
 
@@ -43,40 +47,61 @@ class MemberController extends Controller
     {
         $data = $request->validated();
 
-        DB::transaction(function () use ($request, $data) {
+        $mainMember = DB::transaction(function () use ($request, $data) {
             // Main Member Logic
             $data['is_main'] = true;
-
-            // Generate Main Member Number
-            $data['member_no'] = Member::generateNextMainMemberNo();
 
             if ($request->hasFile('photo')) {
                 $data['photo'] = $request->file('photo')->store('members', 'public');
             }
 
             // EXCLUDE nested family data from main member creation
-            $mainMember = Member::create(Arr::except($data, ['family']));
+            $member = Member::create(Arr::except($data, ['family']));
 
             // Family Members Logic
             if ($request->has('family')) {
-                foreach ($request->family as $familyData) {
+                foreach ($request->family as $index => $familyData) {
                     $familyData['is_main'] = false;
-                    $familyData['parent_id'] = $mainMember->id;
-                    $familyData['member_no'] = $mainMember->generateNextFamilyMemberNo();
+                    $familyData['parent_id'] = $member->id;
+                    $familyData['family_no'] = $familyData['family_no'] ?? $member->family_no;
+
+                    if ($request->hasFile("family.{$index}.photo")) {
+                        $familyData['photo'] = $request->file("family.{$index}.photo")->store('members', 'public');
+                    }
 
                     Member::create($familyData);
                 }
             }
+
+            return $member;
         });
+
+        if ($request->expectsJson()) {
+            return (new MemberResource($mainMember->load('children')))
+                ->response()
+                ->setStatusCode(201);
+        }
 
         return redirect()->route('members.index')->with('success', 'સભ્ય સફળતાપૂર્વક ઉમેરવામાં આવ્યા છે.');
     }
 
     public function show(Member $member)
     {
-        $member->load('children');
+        $mainMember = $member->is_main ? $member : $member->parent;
 
-        return view('members.show', compact('member'));
+        if ($mainMember) {
+            $mainMember->load('children');
+            // Including main member and all children in the list
+            $familyMembers = collect([$mainMember])->concat($mainMember->children);
+        } else {
+            $familyMembers = collect([$member]);
+        }
+
+        if (request()->expectsJson()) {
+            return new MemberResource($member);
+        }
+
+        return view('members.show', compact('member', 'familyMembers'));
     }
 
     public function edit(Member $member)
@@ -100,22 +125,29 @@ class MemberController extends Controller
             $member->update(Arr::except($data, ['family', 'id']));
 
             if ($request->has('family')) {
-                foreach ($request->family as $familyData) {
+                foreach ($request->family as $index => $familyData) {
+                    if ($request->hasFile("family.{$index}.photo")) {
+                        $familyData['photo'] = $request->file("family.{$index}.photo")->store('members', 'public');
+                    }
+
                     if (isset($familyData['id'])) {
                         // Update existing child
                         $child = Member::findOrFail($familyData['id']);
                         $child->update(Arr::except($familyData, ['id']));
                     } else {
-                        // Create new child
                         $familyData['is_main'] = false;
                         $familyData['parent_id'] = $member->id;
-                        $familyData['member_no'] = $member->generateNextFamilyMemberNo();
+                        $familyData['family_no'] = $familyData['family_no'] ?? $member->family_no;
 
                         Member::create($familyData);
                     }
                 }
             }
         });
+
+        if ($request->expectsJson()) {
+            return new MemberResource($member->fresh('children'));
+        }
 
         return redirect()->route('members.show', $member)->with('success', 'સભ્યની વિગતો સફળતાપૂર્વક અપડેટ કરવામાં આવી છે.');
     }
@@ -127,6 +159,10 @@ class MemberController extends Controller
         }
         $member->delete();
 
+        if (request()->expectsJson()) {
+            return response()->json(['message' => 'સભ્ય સફળતાપૂર્વક કાઢી નાખવામાં આવ્યા છે.']);
+        }
+
         return redirect()->route('members.index')->with('success', 'સભ્ય સફળતાપૂર્વક કાઢી નાખવામાં આવ્યા છે.');
     }
 
@@ -135,6 +171,68 @@ class MemberController extends Controller
         $this->ensureFamilyMemberBelongsToMember($member, $familyMember);
 
         return view('family-members.edit', compact('member', 'familyMember'));
+    }
+
+    public function storeFamilyMember(FamilyMemberRequest $request, Member $member): JsonResponse
+    {
+        abort_unless($member->is_main, 404);
+
+        $data = $request->validated();
+
+        if ($request->hasFile('photo')) {
+            $data['photo'] = $request->file('photo')->store('members', 'public');
+        }
+
+        $data['is_main'] = false;
+        $data['parent_id'] = $member->id;
+        $data['family_no'] = $data['family_no'] ?? $member->family_no;
+
+        $familyMember = Member::create($data);
+
+        return (new MemberResource($familyMember))
+            ->response()
+            ->setStatusCode(201);
+    }
+
+    public function showFamilyMember(Member $member, Member $familyMember): MemberResource
+    {
+        $this->ensureFamilyMemberBelongsToMember($member, $familyMember);
+
+        return new MemberResource($familyMember);
+    }
+
+    public function updateFamilyMember(FamilyMemberRequest $request, Member $member, Member $familyMember): MemberResource
+    {
+        $this->ensureFamilyMemberBelongsToMember($member, $familyMember);
+
+        $data = $request->validated();
+
+        if ($request->hasFile('photo')) {
+            if ($familyMember->photo) {
+                Storage::disk('public')->delete($familyMember->photo);
+            }
+
+            $data['photo'] = $request->file('photo')->store('members', 'public');
+        }
+
+        $familyMember->update($data);
+
+        return new MemberResource($familyMember->fresh());
+    }
+
+    public function destroyFamilyMember(Member $member, Member $familyMember): JsonResponse
+    {
+        $this->ensureFamilyMemberBelongsToMember($member, $familyMember);
+
+        if ($familyMember->photo) {
+            Storage::disk('public')->delete($familyMember->photo);
+        }
+
+        $familyMember->delete();
+
+        return response()->json([
+            'message' => 'પરિવારના સભ્ય સફળતાપૂર્વક કાઢી નાખવામાં આવ્યા છે.',
+        ]);
     }
 
     private function ensureFamilyMemberBelongsToMember(Member $member, Member $familyMember): void
@@ -166,14 +264,15 @@ class MemberController extends Controller
                     ->orWhere('first_name', 'like', "%{$search}%")
                     ->orWhere('middle_name', 'like', "%{$search}%")
                     ->orWhere('last_name', 'like', "%{$search}%")
-                    ->orWhere('mobile', 'like', "%{$search}%");
+                    ->orWhere('mobile', 'like', "%{$search}%")
+                    ->orWhere('alternate_mobile', 'like', "%{$search}%");
             });
         }
 
         $members = $membersQuery->get();
 
         // Standardize default columns
-        $defaultColumns = ['member_no', 'full_name', 'mobile', 'city_village', 'children_count'];
+        $defaultColumns = ['member_no', 'full_name', 'mobile', 'address'];
 
         // Robustly get columns (handles columns, columns[], etc.)
         $selectedColumns = $request->input('columns') ?: $request->input('columns_arr');
@@ -183,6 +282,44 @@ class MemberController extends Controller
         }
 
         return view('members.print-all', compact('members', 'selectedColumns'));
+    }
+
+    public function printLabels(Request $request)
+    {
+        $selectedMembers = $request->input('selected_members', []);
+        $width = $request->input('width', '80'); // Default 80mm
+        $height = $request->input('height', '50'); // Default 50mm
+        $groupByFamily = $request->input('group_by_family', false);
+
+        $membersQuery = Member::query()
+            ->with('parent:id,member_no')
+            ->orderBy('family_no')
+            ->orderBy('member_no');
+
+        if (is_array($selectedMembers) && count($selectedMembers) > 0) {
+            $membersQuery->whereIn('member_no', $selectedMembers);
+        } elseif ($request->has('search') && $request->search != '') {
+            $search = $request->get('search');
+            $membersQuery->where(function ($q) use ($search) {
+                $q->where('member_no', 'like', "%{$search}%")
+                    ->orWhere('family_no', 'like', "%{$search}%")
+                    ->orWhere('first_name', 'like', "%{$search}%")
+                    ->orWhere('middle_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('mobile', 'like', "%{$search}%")
+                    ->orWhere('alternate_mobile', 'like', "%{$search}%");
+            });
+        }
+
+        $members = $membersQuery->get();
+
+        if ($groupByFamily) {
+            $members = $members->groupBy('family_no');
+        }
+
+        $selectedColumns = $request->input('columns', ['mobile', 'city_village', 'address']);
+
+        return view('members.print-labels', compact('members', 'width', 'height', 'groupByFamily', 'selectedColumns'));
     }
 
     public function printSingle(Member $member)
@@ -204,7 +341,8 @@ class MemberController extends Controller
                     ->orWhere('first_name', 'like', "%{$search}%")
                     ->orWhere('middle_name', 'like', "%{$search}%")
                     ->orWhere('last_name', 'like', "%{$search}%")
-                    ->orWhere('mobile', 'like', "%{$search}%");
+                    ->orWhere('mobile', 'like', "%{$search}%")
+                    ->orWhere('alternate_mobile', 'like', "%{$search}%");
             });
         }
 
@@ -216,6 +354,7 @@ class MemberController extends Controller
             'full_name' => 'નામ',
             'family_no' => 'પરિવાર નં.',
             'mobile' => 'મોબાઇલ',
+            'alternate_mobile' => 'અલ્ટરનેટ મોબાઇલ',
             'city_village' => 'શહેર / ગામ',
             'mother_name' => 'માતાનું નામ',
             'gender' => 'લિંગ',

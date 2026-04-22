@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Member;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class MemberRequest extends FormRequest
 {
@@ -36,21 +38,36 @@ class MemberRequest extends FormRequest
 
     public function rules(): array
     {
-        $memberId = $this->route('member')?->id;
+        $member = $this->route('member');
+        // Handle both object and string (member_no) from route
+        $memberModel = ($member instanceof Member)
+            ? $member
+            : Member::where('member_no', $member)->first();
 
-        return [
-            'member_no' => 'nullable|string|max:255|unique:members,member_no,'.$memberId,
+        $memberId = $memberModel?->id;
+        $isMain = $memberModel ? $memberModel->is_main : true; // Default to true for store()
+
+        $rules = [
+            'member_no' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('members', 'member_no')->ignore($memberId),
+            ],
+            'family_no' => 'nullable|string|max:255',
             'first_name' => 'required|string|max:255',
             'middle_name' => 'required|string|max:255',
             'mother_name' => 'nullable|string|max:255',
             'last_name' => 'required|string|max:255',
             'gender' => 'required|string',
+            'blood_group' => 'nullable|string|max:10',
             'address' => 'required|string',
             'district' => 'required|string|max:255',
             'sub_district' => 'required|string|max:255',
             'city_village' => 'required|string|max:255',
-            'pincode' => 'required|string|max:10',
-            'mobile' => 'required|string|max:15',
+            'pincode' => 'required|numeric',
+            'mobile' => ($isMain ? 'required' : 'nullable').'|digits:10',
+            'alternate_mobile' => 'nullable|digits:10',
             'email' => 'nullable|email|max:255',
             'date_of_birth' => 'required|date',
             'occupation' => 'nullable|string|max:255',
@@ -60,17 +77,21 @@ class MemberRequest extends FormRequest
 
             // Family members dynamic fields
             'family' => 'nullable|array',
+            'family.*.id' => 'nullable|numeric|exists:members,id',
+            'family.*.family_no' => 'nullable|string|max:255',
             'family.*.first_name' => 'required|string|max:255',
             'family.*.middle_name' => 'required|string|max:255',
             'family.*.mother_name' => 'nullable|string|max:255',
             'family.*.last_name' => 'required|string|max:255',
             'family.*.gender' => 'required|string',
+            'family.*.blood_group' => 'nullable|string|max:10',
             'family.*.address' => 'required|string',
             'family.*.district' => 'required|string|max:255',
             'family.*.sub_district' => 'required|string|max:255',
             'family.*.city_village' => 'required|string|max:255',
-            'family.*.pincode' => 'required|string|max:10',
-            'family.*.mobile' => 'nullable|string|max:15',
+            'family.*.pincode' => 'required|numeric',
+            'family.*.mobile' => 'nullable|digits:10',
+            'family.*.alternate_mobile' => 'nullable|digits:10',
             'family.*.email' => 'nullable|email|max:255',
             'family.*.date_of_birth' => 'required|date',
             'family.*.occupation' => 'nullable|string|max:255',
@@ -78,11 +99,26 @@ class MemberRequest extends FormRequest
             'family.*.relation' => 'required|string|max:255',
             'family.*.photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
+
+        // Custom validation for family member numbers to allow ignore
+        foreach ($this->input('family', []) as $index => $familyMember) {
+            $childId = $familyMember['id'] ?? null;
+            $rules["family.{$index}.member_no"] = [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('members', 'member_no')->ignore($childId),
+            ];
+        }
+
+        return $rules;
     }
 
     public function messages()
     {
         return [
+            'member_no.required' => 'સભ્ય નંબર જરૂરી છે.',
+            'member_no.unique' => 'આ સભ્ય નંબર પહેલેથી ઉપયોગમાં છે.',
             'first_name.required' => 'નામ જરૂરી છે.',
             'middle_name.required' => 'પિતા / પતિનું નામ જરૂરી છે.',
             'last_name.required' => 'અટક જરૂરી છે.',
@@ -93,7 +129,10 @@ class MemberRequest extends FormRequest
             'city_village.required' => 'શહેર / ગામ જરૂરી છે.',
             'pincode.required' => 'પિનકોડ જરૂરી છે.',
             'mobile.required' => 'મોબાઇલ નંબર જરૂરી છે.',
-            'date_of_birth.required' => 'જન્મ તારીખ જરૂરી છે.',
+            'mobile.digits' => 'મોબાઇલ નંબર ૧૦ અંકનો હોવો જોઈએ.',
+            'alternate_mobile.digits' => 'વૈકલ્પિક મોબાઇલ નંબર ૧૦ અંકનો હોવો જોઈએ.',
+            'family.*.mobile.digits' => 'પરિવારના સભ્યનો મોબાઇલ નંબર ૧૦ અંકનો હોવો જોઈએ.',
+            'family.*.alternate_mobile.digits' => 'પરિવારના સભ્યનો વૈકલ્પિક મોબાઇલ નંબર ૧૦ અંકનો હોવો જોઈએ.',
             'photo.image' => 'ફાઇલ ફોટો હોવી જોઈએ.',
             'photo.max' => 'ફોટો 2MB થી મોટો ન હોવો જોઈએ.',
         ];

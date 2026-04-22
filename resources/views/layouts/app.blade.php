@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>ટ્રસ્ટ મેનેજમેન્ટ સિસ્ટમ</title>
+    <title>SGLM MEMBER MANAGMENT</title>
+    <link rel="icon" href="{{ asset('images/logo.jpeg') }}" type="image/jpeg">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gujarati:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
@@ -16,8 +18,13 @@
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar -->
-        <nav class="col-md-3 col-lg-2 d-md-block sidebar p-0">
-            <div class="d-flex flex-column h-100">
+        <nav class="col-md-3 col-lg-2 sidebar offcanvas-md offcanvas-start p-0" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+            <div class="offcanvas-header d-md-none bg-dark-maroon text-white p-3 border-bottom border-gold">
+                <h5 class="offcanvas-title fw-bold" id="sidebarMenuLabel">મેનૂ</h5>
+                <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="offcanvas" data-bs-target="#sidebarMenu" aria-label="Close"></button>
+            </div>
+
+            <div class="offcanvas-body d-flex flex-column h-100">
                 <div class="px-3 mb-4 mt-3">
                     <div class="text-white fw-bold">નમસ્તે, {{ Auth::user()->name }}</div>
                     <hr class="text-white-50 opacity-25">
@@ -50,15 +57,21 @@
         <!-- Main Content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 p-0 d-flex flex-column min-vh-100">
             <header class="navbar sticky-top bg-white flex-md-nowrap p-2 shadow-sm border-bottom">
-                <div class="d-flex align-items-center gap-3 px-3">
-                    <img src="{{ asset('images/logo.jpeg') }}" alt="Lohana Logo" style="height: 50px; width: auto;" class="rounded shadow-sm">
-                    <h5 class="mb-0 text-maroon fw-bold d-none d-md-block">શ્રી ઘોઘારી લોહાણા મહાજન - સુરત</h5>
+
+                <div class="d-flex align-items-center justify-content-between w-100 px-3">
+                    <div class="d-flex align-items-center gap-2 gap-md-3">
+                        <img src="{{ asset('images/logo.jpeg') }}" alt="Lohana Logo" style="height: 40px; width: auto;" class="rounded shadow-sm">
+                        <h6 class="mb-0 text-maroon fw-bold d-md-none" style="font-size: 0.9rem;">SGLM MAHJAN - SURAT</h6>
+                        <h5 class="mb-0 text-maroon fw-bold d-none d-md-block">શ્રી ઘોઘારી લોહાણા મહાજન - સુરત</h5>
+                    </div>
+                   
+                    <button class="navbar-toggler d-md-none border-0 p-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-label="Toggle navigation">
+                        <i class="bi bi-list fs-3 text-maroon"></i>
+                    </button>
+
                 </div>
-               
-                <button class="navbar-toggler position-absolute d-md-none collapsed end-0 me-3" type="button" data-bs-toggle="collapse" data-bs-target=".sidebar" aria-controls="sidebar" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
             </header>
+
 
             <div class="main-content flex-grow-1">
                 @if(session('success'))
@@ -94,7 +107,7 @@
                         </div>
                         <div class="col-md-6 text-center text-md-end mt-2 mt-md-0">
                             <span class="text-muted small footer-tagline">
-                                Developed by <a href="https://ziuinfotech.in/" target="_blank" class="text-maroon fw-bold text-decoration-none">ZIU INFOTECH</a>
+                                Developed by <a href="https://ZiUinfotech.in/" target="_blank" class="text-maroon fw-bold text-decoration-none">ZiU INFOTECH</a>
                             </span>
                         </div>
                     </div>

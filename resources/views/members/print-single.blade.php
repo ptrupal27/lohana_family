@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>સભ્ય પ્રિન્ટ - {{ $member->member_no }}</title>
+    <link rel="icon" href="{{ asset('images/logo.jpeg') }}" type="image/jpeg">
     <style>
         body {
             font-family: Arial, sans-serif;

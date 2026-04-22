@@ -49,21 +49,22 @@
                             <span>મુખ્ય સભ્યોની યાદી</span>
                         </h5>
                     </div>
-                    <form action="{{ route('dashboard') }}" method="GET" class="d-flex gap-2 member-search-form">
+                    <form action="{{ route('dashboard') }}" method="GET" class="d-flex flex-grow-1 gap-2 member-search-form">
                         <div class="input-group">
                             <span class="input-group-text bg-white border-end-0 text-maroon">
                                 <i class="bi bi-search"></i>
                             </span>
                             <input type="text" name="search" class="form-control border-start-0 ps-0 member-search-input"
-                                placeholder="નામ, મોબાઈલ કે સભ્ય નંબર શોધો..." value="{{ request('search') }}">
+                                placeholder="શોધો..." value="{{ request('search') }}">
                             <button class="btn btn-maroon" type="submit">શોધો</button>
                         </div>
                         @if(request('search'))
                             <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary member-clear-btn d-flex align-items-center gap-2">
-                                <i class="bi bi-x-circle"></i> ક્લિયર
+                                <i class="bi bi-x-circle"></i> <span class="d-none d-sm-inline">ક્લિયર</span>
                             </a>
                         @endif
                     </form>
+
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">

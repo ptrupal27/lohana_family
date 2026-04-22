@@ -10,29 +10,6 @@ class Member extends Model
 {
     private const MAIN_MEMBER_PREFIX = 'GLS-S-';
 
-    protected static function booted()
-    {
-        static::creating(function ($member) {
-            if ($member->is_main) {
-                // For main members, family_no is the base part (e.g., GLS-S-001)
-                // member_no is expected to be family_no + "-1"
-                if (str_contains($member->member_no, '-')) {
-                    $parts = explode('-', $member->member_no);
-                    array_pop($parts); // remove the suffix
-                    $member->family_no = implode('-', $parts);
-                } else {
-                    $member->family_no = $member->member_no;
-                    $member->member_no = $member->member_no.'-1';
-                }
-            } elseif ($member->parent_id) {
-                $parent = self::find($member->parent_id);
-                if ($parent) {
-                    $member->family_no = $parent->family_no;
-                }
-            }
-        });
-    }
-
     protected $fillable = [
         'member_no',
         'family_no',
@@ -44,12 +21,14 @@ class Member extends Model
         'mother_name',
         'last_name',
         'gender',
+        'blood_group',
         'address',
         'district',
         'sub_district',
         'city_village',
         'pincode',
         'mobile',
+        'alternate_mobile',
         'email',
         'date_of_birth',
         'occupation',

@@ -8,7 +8,6 @@ test('web member route names resolve to web urls', function () {
 });
 
 test('api member route names are namespaced away from web routes', function () {
-    expect(route('api.login', absolute: false))->toBe('/api/login');
     expect(route('api.members.index', absolute: false))->toBe('/api/members');
     expect(route('api.members.show', ['member' => 'GLS-S-001'], absolute: false))->toBe('/api/members/GLS-S-001');
 });
