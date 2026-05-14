@@ -50,7 +50,11 @@
 
                         <div class="col-12">
                             <label class="form-label fw-bold mb-2">ક્યા સભ્યો માટે પ્રિન્ટ કરવું છે?</label>
-                            <div class="d-flex gap-3 mb-3">
+                            <div class="d-flex flex-wrap gap-3 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="print_type" id="printMainOnlyType" value="main_only">
+                                    <label class="form-check-label" for="printMainOnlyType">ફક્ત મુખ્ય સભ્યો</label>
+                                </div>
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="print_type" id="printAllType" value="all" checked>
                                     <label class="form-check-label" for="printAllType">બધા સભ્યો</label>
@@ -106,6 +110,19 @@
     <div class="card-body p-0">
         <div class="p-4 bg-soft-maroon border-bottom">
             <form action="{{ route('members.index') }}" method="GET" class="row g-3">
+                <div class="col-lg-3 col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-geo-alt text-maroon"></i>
+                        </span>
+                        <select name="area" class="form-select border-start-0 ps-0" onchange="this.form.submit()">
+                            <option value="">તમામ એરિયા</option>
+                            @foreach($areas as $areaName)
+                                <option value="{{ $areaName }}" {{ request('area') == $areaName ? 'selected' : '' }}>{{ $areaName }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
                 <div class="col-lg-4 col-md-5">
                     <div class="input-group">
                         <span class="input-group-text bg-white border-end-0">
@@ -115,9 +132,9 @@
                         <button class="btn btn-maroon px-3" type="submit">શોધો</button>
                     </div>
                 </div>
-                <div class="col-lg-8 col-md-7">
+                <div class="col-lg-5 col-md-3">
                     <div class="d-flex flex-wrap justify-content-md-end align-items-center gap-2">
-                        @if(request('search') || request('columns'))
+                        @if(request('search') || request('area') || request('columns'))
                             <a href="{{ route('members.index') }}" class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2 shadow-sm">
                                 <i class="bi bi-x-circle"></i> ફિલ્ટર ક્લિયર
                             </a>
@@ -148,8 +165,7 @@
                                                 'occupation' => 'વ્યવસાય',
                                                 'hometown' => 'વતન',
                                                 'address' => 'સરનામું',
-                                                'district' => 'જિલ્લો',
-                                                'sub_district' => 'તાલુકો',
+                                                'area' => 'એરિયા',
                                                 'date_of_birth' => 'જન્મ તારીખ',
                                                 'children_count' => 'પરિવારની સંખ્યા',
                                                 'is_main' => 'સભ્ય પ્રકાર'
@@ -261,8 +277,7 @@
                         <th class="col-occupation d-none">વ્યવસાય</th>
                         <th class="col-hometown d-none">વતન</th>
                         <th class="col-address">સરનામું</th>
-                        <th class="col-district d-none">જિલ્લો</th>
-                        <th class="col-sub_district d-none">તાલુકો</th>
+                        <th class="col-area d-none">એરિયા</th>
                         <th class="col-date_of_birth d-none">જન્મ તારીખ</th>
                         <th class="text-center col-children_count d-none">પરિવારની સંખ્યા</th>
                         <th class="col-is_main d-none">સભ્ય પ્રકાર</th>
@@ -291,8 +306,7 @@
                             <td class="col-occupation d-none">{{ $member->occupation }}</td>
                             <td class="col-hometown d-none">{{ $member->hometown }}</td>
                             <td class="col-address">{{ $member->address }}</td>
-                            <td class="col-district d-none">{{ $member->district }}</td>
-                            <td class="col-sub_district d-none">{{ $member->sub_district }}</td>
+                            <td class="col-area d-none">{{ $member->area }}</td>
                             <td class="col-date_of_birth d-none">{{ $member->date_of_birth ? \Carbon\Carbon::parse($member->date_of_birth)->format('d/m/Y') : '-' }}</td>
                             <td class="text-center col-children_count d-none">
                                 <span class="text-dark px-3">{{ $member->children_count + 1 }}</span>
@@ -329,8 +343,10 @@
         </div>
         
         @if($members->hasPages())
-            <div class="p-4 border-top">
-                {{ $members->links() }}
+            <div class="card-footer bg-white border-0 py-3 border-top">
+                <div class="d-flex justify-content-center">
+                    {{ $members->links() }}
+                </div>
             </div>
         @endif
     </div>

@@ -20,7 +20,7 @@ function clearValidationErrors(form) {
     form.querySelectorAll(".is-invalid").forEach((el) => {
         el.classList.remove("is-invalid");
     });
-    form.querySelectorAll(".invalid-feedback").forEach((el) => {
+    form.querySelectorAll(".invalid-feedback, .api-error-message").forEach((el) => {
         el.remove();
     });
     form.querySelectorAll(".has-validation").forEach((el) => {
@@ -84,15 +84,21 @@ function renderValidationErrors(form, errors) {
 
             const errorDiv = document.createElement("div");
             errorDiv.className =
-                "text-danger fw-bold small mt-1 animate__animated animate__fadeIn";
+                "invalid-feedback api-error-message text-danger fw-bold small mt-1 animate__animated animate__fadeIn";
             errorDiv.innerText = messages[0];
 
             const group = input.closest(".input-group");
             if (group) {
                 group.classList.add("has-validation");
-                group.appendChild(errorDiv);
+                // Avoid duplicates if render is called multiple times
+                if (!group.querySelector(".api-error-message")) {
+                    group.appendChild(errorDiv);
+                }
             } else {
-                input.after(errorDiv);
+                // Avoid duplicates if render is called multiple times
+                if (!input.nextElementSibling?.classList.contains("api-error-message")) {
+                    input.after(errorDiv);
+                }
             }
 
             errorFound = true;

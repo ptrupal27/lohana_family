@@ -30,15 +30,16 @@ class MemberResource extends JsonResource
             'email' => $this->email,
             'date_of_birth' => $this->date_of_birth,
             'address' => $this->address,
-            'district' => $this->district,
-            'sub_district' => $this->sub_district,
+            'area' => $this->area,
             'city_village' => $this->city_village,
             'pincode' => $this->pincode,
             'occupation' => $this->occupation,
             'hometown' => $this->hometown,
             'relation' => $this->relation,
             'photo_url' => $this->photo ? asset('storage/'.$this->photo) : null,
-            'family_members' => MemberResource::collection($this->whenLoaded('children')),
+            'family_members' => $this->when(isset($this->family_group), function () {
+                return MemberResource::collection($this->family_group);
+            }, MemberResource::collection($this->whenLoaded('children'))),
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
         ];

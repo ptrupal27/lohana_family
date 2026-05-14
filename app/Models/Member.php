@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Member extends Model
 {
+    use HasFactory;
+
     private const MAIN_MEMBER_PREFIX = 'GLS-S-';
 
     protected $fillable = [
@@ -23,8 +26,7 @@ class Member extends Model
         'gender',
         'blood_group',
         'address',
-        'district',
-        'sub_district',
+        'area',
         'city_village',
         'pincode',
         'mobile',
@@ -38,7 +40,8 @@ class Member extends Model
 
     public function children(): HasMany
     {
-        return $this->hasMany(Member::class, 'parent_id');
+        return $this->hasMany(Member::class, 'parent_id')
+            ->orderByRaw('LENGTH(member_no), member_no');
     }
 
     public function parent(): BelongsTo

@@ -96,8 +96,7 @@
             'occupation' => 'વ્યવસાય',
             'hometown' => 'વતન',
             'address' => 'સરનામું',
-            'district' => 'જિલ્લો',
-            'sub_district' => 'તાલુકો',
+            'area' => 'એરિયા',
             'date_of_birth' => 'જન્મ તારીખ',
             'children_count' => 'પરિવારની સંખ્યા',
             'is_main' => 'સભ્ય પ્રકાર'

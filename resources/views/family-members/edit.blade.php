@@ -102,14 +102,9 @@
                     <textarea name="address" rows="1" class="form-control" required>{{ old('address', $familyMember->address) }}</textarea>
                 </div>
 
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">જિલ્લો <span class="text-danger">*</span></label>
-                    <input type="text" name="district" class="form-control" value="{{ old('district', $familyMember->district) }}" required>
-                </div>
-
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">તાલુકો <span class="text-danger">*</span></label>
-                    <input type="text" name="sub_district" class="form-control" value="{{ old('sub_district', $familyMember->sub_district) }}" required>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">એરિયા <span class="text-danger">*</span></label>
+                    <input type="text" name="area" class="form-control" value="{{ old('area', $familyMember->area) }}" required>
                 </div>
 
                 <div class="col-md-3 mb-3">

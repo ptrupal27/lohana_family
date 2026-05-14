@@ -62,8 +62,7 @@ class MemberRequest extends FormRequest
             'gender' => 'required|string',
             'blood_group' => 'nullable|string|max:10',
             'address' => 'required|string',
-            'district' => 'required|string|max:255',
-            'sub_district' => 'required|string|max:255',
+            'area' => 'required|string|max:255',
             'city_village' => 'required|string|max:255',
             'pincode' => 'required|numeric',
             'mobile' => ($isMain ? 'required' : 'nullable').'|digits:10',
@@ -86,8 +85,7 @@ class MemberRequest extends FormRequest
             'family.*.gender' => 'required|string',
             'family.*.blood_group' => 'nullable|string|max:10',
             'family.*.address' => 'required|string',
-            'family.*.district' => 'required|string|max:255',
-            'family.*.sub_district' => 'required|string|max:255',
+            'family.*.area' => 'required|string|max:255',
             'family.*.city_village' => 'required|string|max:255',
             'family.*.pincode' => 'required|numeric',
             'family.*.mobile' => 'nullable|digits:10',
@@ -124,8 +122,7 @@ class MemberRequest extends FormRequest
             'last_name.required' => 'અટક જરૂરી છે.',
             'gender.required' => 'લિંગ પસંદ કરવું જરૂરી છે.',
             'address.required' => 'સરનામું જરૂરી છે.',
-            'district.required' => 'જિલ્લો જરૂરી છે.',
-            'sub_district.required' => 'તાલુકો જરૂરી છે.',
+            'area.required' => 'એરિયા જરૂરી છે.',
             'city_village.required' => 'શહેર / ગામ જરૂરી છે.',
             'pincode.required' => 'પિનકોડ જરૂરી છે.',
             'mobile.required' => 'મોબાઇલ નંબર જરૂરી છે.',
@@ -135,6 +132,8 @@ class MemberRequest extends FormRequest
             'family.*.alternate_mobile.digits' => 'પરિવારના સભ્યનો વૈકલ્પિક મોબાઇલ નંબર ૧૦ અંકનો હોવો જોઈએ.',
             'photo.image' => 'ફાઇલ ફોટો હોવી જોઈએ.',
             'photo.max' => 'ફોટો 2MB થી મોટો ન હોવો જોઈએ.',
+            'date_of_birth.required' => 'જન્મ તારીખ જરૂરી છે.',
+            'date_of_birth.date' => 'જન્મ તારીખ યોગ્ય ફોર્મેટમાં નથી.',
         ];
     }
 

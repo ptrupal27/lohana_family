@@ -227,8 +227,8 @@ header.navbar {
 }
 
 .table-sticky-header {
-    max-height: 500px;
-    overflow-y: auto;
+    max-height: none;
+    overflow-y: visible;
     border-radius: 0 0 12px 12px;
 }
 
@@ -269,6 +269,18 @@ header.navbar {
 
 .card-crimson {
     background: linear-gradient(135deg, #dc143c, #8b0000);
+    color: white;
+    border: none !important;
+}
+
+.card-blue {
+    background: linear-gradient(135deg, #1e3a8a, #1e40af);
+    color: white;
+    border: none !important;
+}
+
+.card-pink {
+    background: linear-gradient(135deg, #db2777, #be185d);
     color: white;
     border: none !important;
 }
@@ -434,4 +446,50 @@ input[type="number"]::-webkit-inner-spin-button {
 
 input[type="number"] {
     -moz-appearance: textfield;
+}
+
+/* Pagination Styles - Circular Minimal Design */
+.pagination {
+    margin-bottom: 0;
+    gap: 5px;
+    border: none;
+}
+
+.pagination .page-item .page-link {
+    color: #444;
+    background: transparent;
+    border: none;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50% !important;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin: 0 2px;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-maroon) !important;
+    color: white !important;
+    box-shadow: 0 4px 8px rgba(128, 0, 0, 0.25);
+    transform: scale(1.1);
+}
+
+.pagination .page-item:not(.active) .page-link:hover {
+    background-color: rgba(128, 0, 0, 0.08);
+    color: var(--primary-maroon);
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #bbb;
+    background: transparent;
+}
+
+.pagination .page-item:first-child .page-link,
+.pagination .page-item:last-child .page-link {
+    font-size: 1.2rem;
+    color: #333;
 }

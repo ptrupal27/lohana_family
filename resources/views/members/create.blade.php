@@ -131,13 +131,9 @@
                         <textarea name="address" id="main_address" rows="2" class="form-control form-control-lg bg-light" required></textarea>
                     </div>
 
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold">જિલ્લો <span class="text-danger">*</span></label>
-                        <input type="text" name="district" id="main_district" class="form-control form-control-lg bg-light" required>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold">તાલુકો <span class="text-danger">*</span></label>
-                        <input type="text" name="sub_district" id="main_sub_district" class="form-control form-control-lg bg-light" required>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">એરિયા <span class="text-danger">*</span></label>
+                        <input type="text" name="area" id="main_area" class="form-control form-control-lg bg-light" required>
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-bold">શહેર / ગામ <span class="text-danger">*</span></label>
@@ -262,13 +258,9 @@
             <textarea name="family[INDEX][address]" id="address_INDEX" rows="1" class="form-control form-control-lg bg-light" required></textarea>
         </div>
 
-        <div class="col-md-3">
-            <label class="form-label fw-bold">જિલ્લો <span class="text-danger">*</span></label>
-            <input type="text" name="family[INDEX][district]" id="district_INDEX" class="form-control form-control-lg bg-light" required>
-        </div>
-        <div class="col-md-3">
-            <label class="form-label fw-bold">તાલુકો <span class="text-danger">*</span></label>
-            <input type="text" name="family[INDEX][sub_district]" id="sub_district_INDEX" class="form-control form-control-lg bg-light" required>
+        <div class="col-md-6">
+            <label class="form-label fw-bold">એરિયા <span class="text-danger">*</span></label>
+            <input type="text" name="family[INDEX][area]" id="area_INDEX" class="form-control form-control-lg bg-light" required>
         </div>
         <div class="col-md-3">
             <label class="form-label fw-bold">શહેર / ગામ <span class="text-danger">*</span></label>
@@ -296,6 +288,16 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 <script>
     let familyCount = 0;
+
+    function reIndexTabs() {
+        const tabs = document.querySelectorAll('#memberTabs .nav-link');
+        tabs.forEach((tab, index) => {
+            const stepNum = tab.querySelector('.step-num');
+            if (stepNum) {
+                stepNum.textContent = index + 1;
+            }
+        });
+    }
 
     function bindFamilyNamePreview(paneElement, index) {
         const firstNameInput = paneElement.querySelector(`input[name="family[${index}][first_name]"]`);
@@ -419,6 +421,7 @@
         }
 
         toggleFamilyInput();
+        reIndexTabs();
         updateButtonVisibility();
         
         const firstNewTab = document.getElementById(`family-tab-${familyCount - count + 1}`);
@@ -432,6 +435,7 @@
         const pane = document.getElementById(paneId);
         if (tab) tab.closest('li').remove();
         if (pane) pane.remove();
+        reIndexTabs();
         updateButtonVisibility();
         const mainTab = document.querySelector('#main-tab');
         if (mainTab) {
@@ -440,7 +444,7 @@
     }
 
     function copyMainAddress(index) {
-        const fields = ['address', 'district', 'sub_district', 'city_village', 'pincode', 'family_no'];
+        const fields = ['address', 'area', 'city_village', 'pincode', 'family_no'];
         fields.forEach(field => {
             const mainField = document.getElementById(`main_${field}`);
             const familyField = document.getElementById(`${field}_${index}`);

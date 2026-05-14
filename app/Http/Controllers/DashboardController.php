@@ -12,21 +12,9 @@ class DashboardController extends Controller
         $totalMembers = Member::where('is_main', true)->count();
         $totalFamilyMembers = Member::where('is_main', false)->count();
 
-        $query = Member::where('is_main', true)->withCount('children');
+        $totalMales = Member::where('gender', 'Male')->count();
+        $totalFemales = Member::where('gender', 'Female')->count();
 
-        if ($request->has('search')) {
-            $search = $request->get('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('member_no', 'like', "%{$search}%")
-                    ->orWhere('first_name', 'like', "%{$search}%")
-                    ->orWhere('middle_name', 'like', "%{$search}%")
-                    ->orWhere('last_name', 'like', "%{$search}%")
-                    ->orWhere('mobile', 'like', "%{$search}%");
-            });
-        }
-
-        $recentMembers = $query->latest()->take(10)->get();
-
-        return view('dashboard', compact('totalMembers', 'totalFamilyMembers', 'recentMembers'));
+        return view('dashboard', compact('totalMembers', 'totalFamilyMembers', 'totalMales', 'totalFemales'));
     }
 }

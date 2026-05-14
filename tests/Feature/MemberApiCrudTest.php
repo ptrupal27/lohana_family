@@ -128,6 +128,16 @@ test('family members can be updated and deleted through the api', function () {
     ]);
 });
 
+test('members can be filtered by area', function () {
+    createMainMember(['member_no' => 'M1', 'area' => 'Area A']);
+    createMainMember(['member_no' => 'M2', 'area' => 'Area B']);
+
+    $this->get('/members?area=Area A')
+        ->assertSuccessful()
+        ->assertSee('M1')
+        ->assertDontSee('M2');
+});
+
 function memberPayload(array $overrides = []): array
 {
     return array_merge([
@@ -138,8 +148,7 @@ function memberPayload(array $overrides = []): array
         'last_name' => 'Patel',
         'gender' => 'Male',
         'address' => 'SURAT (M CORP.) (PART) C-27 PARMAHANS NEAR TRIKAMNAGAR Provident placeat',
-        'district' => 'Surat',
-        'sub_district' => 'Surat',
+        'area' => 'Varachha',
         'city_village' => 'Surat (M Corp.) (Part)',
         'pincode' => '395010',
         'mobile' => '9090909090',
@@ -160,8 +169,7 @@ function familyPayload(array $overrides = []): array
         'last_name' => 'Patel',
         'gender' => 'Male',
         'address' => 'Family address line',
-        'district' => 'Surat',
-        'sub_district' => 'Surat',
+        'area' => 'Varachha',
         'city_village' => 'Surat',
         'pincode' => '395010',
         'mobile' => '9090909091',

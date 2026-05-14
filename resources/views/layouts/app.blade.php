@@ -33,12 +33,17 @@
                     <ul class="nav flex-column">
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
-                                <i class="bi bi-speedometer2 me-2"></i> ડેશબોર્ડ
+                                <i class="bi bi-house-door me-2"></i> ડેશબોર્ડ
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('members.*') ? 'active' : '' }}" href="{{ route('members.index') }}">
-                                <i class="bi bi-people me-2"></i> સભ્યો
+                            <a class="nav-link {{ request()->routeIs('members.main') ? 'active' : '' }}" href="{{ route('members.main') }}">
+                                <i class="bi bi-person-check me-2"></i> મુખ્ય સભ્યો
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('members.index') || request()->routeIs('members.show') || request()->routeIs('members.edit') || request()->routeIs('members.create') ? 'active' : '' }}" href="{{ route('members.index') }}">
+                                <i class="bi bi-people me-2"></i> સભ્યોની યાદી
                             </a>
                         </li>
                     </ul>
@@ -56,6 +61,7 @@
 
         <!-- Main Content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 p-0 d-flex flex-column min-vh-100">
+            @if(!request()->routeIs('dashboard'))
             <header class="navbar sticky-top bg-white flex-md-nowrap p-2 shadow-sm border-bottom">
 
                 <div class="d-flex align-items-center justify-content-between w-100 px-3">
@@ -71,6 +77,8 @@
 
                 </div>
             </header>
+            @endif
+
 
 
             <div class="main-content flex-grow-1">

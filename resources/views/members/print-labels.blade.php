@@ -6,6 +6,11 @@
     <title>લેબલ પ્રિન્ટ</title>
     <link rel="icon" href="{{ asset('images/logo.jpeg') }}" type="image/jpeg">
     <style>
+        @php
+            $scaleX = $width / 80;
+            $scaleY = $height / 50;
+            $scale = min($scaleX, $scaleY);
+        @endphp
         @page {
             margin: 0;
             size: auto;
@@ -25,11 +30,11 @@
         }
         .label-card {
             background: white;
-            border: 2px solid #000;
+            border: {{ max(1, 2 * $scale) }}px solid #000;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            padding: 12px;
+            padding: {{ 12 * $scale }}px;
             box-sizing: border-box;
             position: relative;
             page-break-inside: avoid;
@@ -39,39 +44,42 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 5px;
-            border-bottom: 2.5px solid #000;
-            margin-bottom: 10px;
+            padding-bottom: {{ 5 * $scale }}px;
+            border-bottom: {{ max(1, 2.5 * $scale) }}px solid #000;
+            margin-bottom: {{ 10 * $scale }}px;
         }
         .member-no {
-            font-size: 1rem;
+            font-size: {{ 1 * $scale }}rem;
             font-weight: 800;
             color: #000;
             text-transform: uppercase;
         }
         .family-no {
-            font-size: 1rem;
+            font-size: {{ 1 * $scale }}rem;
             font-weight: 600;
             color: #000;
         }
         .body-content {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: {{ 4 * $scale }}px;
         }
         .name {
-            font-size: 1.4rem;
+            font-size: {{ 1.4 * $scale }}rem;
             font-weight: 800;
             color: #000;
-            margin-bottom: 6px;
+            margin-bottom: {{ 6 * $scale }}px;
             line-height: 1.2;
+            word-wrap: break-word;
+            white-space: normal;
         }
         .info-row {
-            font-size: 1rem;
+            font-size: {{ 1 * $scale }}rem;
             color: #000;
             line-height: 1.4;
             display: flex;
-            gap: 5px;
+            gap: {{ 5 * $scale }}px;
+            word-wrap: break-word;
         }
         .field-label {
             font-weight: 700;
@@ -79,6 +87,10 @@
         }
         .field-value {
             font-weight: 400;
+            word-break: break-word;
+            word-wrap: break-word;
+            flex: 1;
+            min-width: 0;
         }
         
         @media print {
@@ -92,7 +104,7 @@
             .label-card {
                 box-shadow: none;
                 float: left;
-                border: 2px solid #000; /* Ensure thick border prints */
+                border: {{ max(1, 2 * $scale) }}px solid #000; /* Ensure thick border prints */
             }
             .no-print {
                 display: none;

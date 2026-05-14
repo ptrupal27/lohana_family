@@ -11,6 +11,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/main-members', [MemberController::class, 'mainMembers'])->name('members.main');
     Route::get('members/print', [MemberController::class, 'printAll'])->name('members.print.all');
     Route::get('members/print-labels', [MemberController::class, 'printLabels'])->name('members.print.labels');
     Route::get('members/{member}/print', [MemberController::class, 'printSingle'])->name('members.print.single');

@@ -20,7 +20,7 @@ class MemberController extends Controller
             ->with('parent:id,member_no,first_name,middle_name,last_name')
             ->withCount('children');
 
-        if ($request->has('search')) {
+        if ($request->filled('search')) {
             $search = $request->get('search');
             $query->where(function ($q) use ($search) {
                 $q->where('member_no', 'like', "%{$search}%")
@@ -33,9 +33,72 @@ class MemberController extends Controller
             });
         }
 
-        $members = $query->latest()->paginate(10)->withQueryString();
+        if ($request->filled('area')) {
+            $query->where('area', $request->get('area'));
+        }
 
-        return view('members.index', compact('members'));
+        if ($request->filled('gender')) {
+            $query->where('gender', $request->get('gender'));
+        }
+
+        if ($request->filled('is_main')) {
+            $query->where('is_main', $request->get('is_main'));
+        }
+
+        $members = $query->orderByRaw('LENGTH(family_no), family_no')
+            ->orderByDesc('is_main')
+            ->orderByRaw('LENGTH(member_no), member_no')
+            ->paginate(25)
+            ->onEachSide(1)
+            ->withQueryString();
+
+        $areas = Member::query()
+            ->whereNotNull('area')
+            ->where('area', '!=', '')
+            ->distinct()
+            ->orderBy('area')
+            ->pluck('area');
+
+        return view('members.index', compact('members', 'areas'));
+    }
+
+    public function mainMembers(Request $request)
+    {
+        $query = Member::query()
+            ->where('is_main', true)
+            ->withCount('children');
+
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('member_no', 'like', "%{$search}%")
+                    ->orWhere('family_no', 'like', "%{$search}%")
+                    ->orWhere('first_name', 'like', "%{$search}%")
+                    ->orWhere('middle_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('mobile', 'like', "%{$search}%")
+                    ->orWhere('alternate_mobile', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('area')) {
+            $query->where('area', $request->get('area'));
+        }
+
+        $members = $query->orderByRaw('LENGTH(family_no), family_no')
+            ->orderByRaw('LENGTH(member_no), member_no')
+            ->paginate(25)
+            ->onEachSide(1)
+            ->withQueryString();
+
+        $areas = Member::query()
+            ->whereNotNull('area')
+            ->where('area', '!=', '')
+            ->distinct()
+            ->orderBy('area')
+            ->pluck('area');
+
+        return view('members.main', compact('members', 'areas'));
     }
 
     public function create()
@@ -98,10 +161,12 @@ class MemberController extends Controller
         }
 
         if (request()->expectsJson()) {
+            $member->family_group = $familyMembers;
+
             return new MemberResource($member);
         }
 
-        return view('members.show', compact('member', 'familyMembers'));
+        return view('members.show', compact('member', 'familyMembers', 'mainMember'));
     }
 
     public function edit(Member $member)
@@ -125,6 +190,13 @@ class MemberController extends Controller
             $member->update(Arr::except($data, ['family', 'id']));
 
             if ($request->has('family')) {
+                $existingChildrenIds = collect($request->family)->pluck('id')->filter()->toArray();
+
+                // Delete children that were removed from the form
+                Member::where('parent_id', $member->id)
+                    ->whereNotIn('id', $existingChildrenIds)
+                    ->delete();
+
                 foreach ($request->family as $index => $familyData) {
                     if ($request->hasFile("family.{$index}.photo")) {
                         $familyData['photo'] = $request->file("family.{$index}.photo")->store('members', 'public');
@@ -142,6 +214,9 @@ class MemberController extends Controller
                         Member::create($familyData);
                     }
                 }
+            } else {
+                // If family key is missing (all removed), delete all children
+                Member::where('parent_id', $member->id)->delete();
             }
         });
 
@@ -250,7 +325,9 @@ class MemberController extends Controller
         $membersQuery = Member::query()
             ->with('parent:id,member_no')
             ->withCount('children')
-            ->orderBy('member_no');
+            ->orderByRaw('LENGTH(family_no), family_no')
+            ->orderByDesc('is_main')
+            ->orderByRaw('LENGTH(member_no), member_no');
 
         if (is_array($selectedMembers) && count($selectedMembers) > 0) {
             $membersQuery->whereIn('member_no', $selectedMembers);
@@ -290,25 +367,33 @@ class MemberController extends Controller
         $width = $request->input('width', '80'); // Default 80mm
         $height = $request->input('height', '50'); // Default 50mm
         $groupByFamily = $request->input('group_by_family', false);
+        $printType = $request->input('print_type', 'all');
 
         $membersQuery = Member::query()
             ->with('parent:id,member_no')
-            ->orderBy('family_no')
-            ->orderBy('member_no');
+            ->orderByRaw('LENGTH(family_no), family_no')
+            ->orderByDesc('is_main')
+            ->orderByRaw('LENGTH(member_no), member_no');
 
-        if (is_array($selectedMembers) && count($selectedMembers) > 0) {
+        if ($printType === 'selected' && is_array($selectedMembers) && count($selectedMembers) > 0) {
             $membersQuery->whereIn('member_no', $selectedMembers);
-        } elseif ($request->has('search') && $request->search != '') {
-            $search = $request->get('search');
-            $membersQuery->where(function ($q) use ($search) {
-                $q->where('member_no', 'like', "%{$search}%")
-                    ->orWhere('family_no', 'like', "%{$search}%")
-                    ->orWhere('first_name', 'like', "%{$search}%")
-                    ->orWhere('middle_name', 'like', "%{$search}%")
-                    ->orWhere('last_name', 'like', "%{$search}%")
-                    ->orWhere('mobile', 'like', "%{$search}%")
-                    ->orWhere('alternate_mobile', 'like', "%{$search}%");
-            });
+        } else {
+            if ($printType === 'main_only') {
+                $membersQuery->where('is_main', true);
+            }
+
+            if ($request->has('search') && $request->search != '') {
+                $search = $request->get('search');
+                $membersQuery->where(function ($q) use ($search) {
+                    $q->where('member_no', 'like', "%{$search}%")
+                        ->orWhere('family_no', 'like', "%{$search}%")
+                        ->orWhere('first_name', 'like', "%{$search}%")
+                        ->orWhere('middle_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('mobile', 'like', "%{$search}%")
+                        ->orWhere('alternate_mobile', 'like', "%{$search}%");
+                });
+            }
         }
 
         $members = $membersQuery->get();
@@ -331,7 +416,10 @@ class MemberController extends Controller
 
     public function exportExcel(Request $request)
     {
-        $query = Member::query()->orderBy('member_no');
+        $query = Member::query()
+            ->orderByRaw('LENGTH(family_no), family_no')
+            ->orderByDesc('is_main')
+            ->orderByRaw('LENGTH(member_no), member_no');
 
         if ($request->has('search')) {
             $search = $request->get('search');
@@ -361,8 +449,7 @@ class MemberController extends Controller
             'occupation' => 'વ્યવસાય',
             'hometown' => 'વતન',
             'address' => 'સરનામું',
-            'district' => 'જિલ્લો',
-            'sub_district' => 'તાલુકો',
+            'area' => 'એરિયા',
             'date_of_birth' => 'જન્મ તારીખ',
             'children_count' => 'પરિવારની સંખ્યા',
             'is_main' => 'સભ્ય પ્રકાર',

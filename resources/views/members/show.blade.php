@@ -82,13 +82,9 @@
                         <label class="text-muted small d-block">પિનકોડ</label>
                         <span class="fw-bold">{{ $member->pincode }}</span>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="text-muted small d-block">તાલુકો</label>
-                        <span class="fw-bold">{{ $member->sub_district }}</span>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="text-muted small d-block">જિલ્લો</label>
-                        <span class="fw-bold">{{ $member->district }}</span>
+                    <div class="col-md-12 mb-3">
+                        <label class="text-muted small d-block">એરિયા</label>
+                        <span class="fw-bold">{{ $member->area }}</span>
                     </div>
                 </div>
             </div>
@@ -97,7 +93,7 @@
         <div class="card shadow-sm border-0">
             <div class="card-header bg-white border-bottom-0 pt-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
                 <h5 class="mb-0 fw-bold text-success">પરિવારના સભ્યો</h5>
-                @if($member->is_main)
+                @if($mainMember)
                 <button type="button" class="btn btn-sm btn-success px-3 fw-bold" data-bs-toggle="modal" data-bs-target="#addFamilyMemberModal">
                     <i class="bi bi-plus-lg me-1"></i> ઉમેરો
                 </button>
@@ -137,11 +133,11 @@
                                                     <i class="bi bi-eye"></i>
                                                 </a>
                                             @else
-                                                <a href="{{ route('family-members.edit', [$family->parent_id ?? $member->id, $family]) }}" class="btn btn-icon btn-edit" title="એડિટ">
+                                                <a href="{{ route('family-members.edit', [$mainMember ?? $member, $family]) }}" class="btn btn-icon btn-edit" title="એડિટ">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
-                                                @if($member->is_main)
-                                                <form action="{{ route('api.members.family-members.destroy', [$member, $family]) }}" method="POST" class="d-inline" data-api-delete-form data-api-url="{{ route('api.members.family-members.destroy', [$member, $family]) }}" data-reload="true">
+                                                @if($mainMember)
+                                                <form action="{{ route('api.members.family-members.destroy', [$mainMember, $family]) }}" method="POST" class="d-inline" data-api-delete-form data-api-url="{{ route('api.members.family-members.destroy', [$mainMember, $family]) }}" data-reload="true">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-icon btn-delete" title="ડિલીટ">
@@ -166,12 +162,12 @@
     </div>
 </div>
 
-@if($member->is_main)
+@if($mainMember)
 <!-- Add Family Member Modal -->
 <div class="modal fade" id="addFamilyMemberModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content border-0 shadow">
-            <form action="{{ route('api.members.family-members.store', $member) }}" method="POST" enctype="multipart/form-data" data-api-form data-api-url="{{ route('api.members.family-members.store', $member) }}" data-reload="true">
+            <form action="{{ route('api.members.family-members.store', $mainMember) }}" method="POST" enctype="multipart/form-data" data-api-form data-api-url="{{ route('api.members.family-members.store', $mainMember) }}" data-reload="true">
                 @csrf
                 <div class="modal-header bg-success text-white">
                     <h5 class="modal-title fw-bold">પરિવારના સભ્ય ઉમેરો</h5>
@@ -229,13 +225,9 @@
                             <label class="form-label small fw-bold">સરનામું <span class="text-danger">*</span></label>
                             <textarea name="address" id="modal_address" rows="1" class="form-control" required></textarea>
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-bold">જિલ્લો <span class="text-danger">*</span></label>
-                            <input type="text" name="district" id="modal_district" class="form-control" required>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-bold">તાલુકો <span class="text-danger">*</span></label>
-                            <input type="text" name="sub_district" id="modal_sub_district" class="form-control" required>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">એરિયા <span class="text-danger">*</span></label>
+                            <input type="text" name="area" id="modal_area" class="form-control" required>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-bold">શહેર / ગામ <span class="text-danger">*</span></label>
@@ -276,8 +268,7 @@
 <script>
     function copyAddressToModal() {
         document.getElementById('modal_address').value = "{{ $member->address }}";
-        document.getElementById('modal_district').value = "{{ $member->district }}";
-        document.getElementById('modal_sub_district').value = "{{ $member->sub_district }}";
+        document.getElementById('modal_area').value = "{{ $member->area }}";
         document.getElementById('modal_city_village').value = "{{ $member->city_village }}";
         document.getElementById('modal_pincode').value = "{{ $member->pincode }}";
         document.getElementById('modal_family_no').value = "{{ $member->family_no }}";
