@@ -15,7 +15,7 @@
         <a href="{{ route('members.print.all') }}" target="_blank" class="btn btn-outline-dark px-3 py-2 fw-bold">
             <i class="bi bi-printer me-2"></i> બધા પ્રિન્ટ
         </a>
-        <a href="{{ route('members.create') }}" class="btn btn-primary px-3 py-2 fw-bold">
+        <a href="{{ route('members.create', ['return_page' => request('page')]) }}" class="btn btn-primary px-3 py-2 fw-bold">
             <i class="bi bi-person-plus-fill me-2"></i> નવો સભ્ય ઉમેરો
         </a>
     </div>
@@ -314,10 +314,10 @@
                             <td class="col-is_main d-none">{{ $member->is_main ? 'મુખ્ય સભ્ય' : 'પરિવાર સભ્ય' }}</td>
                             <td class="text-end pe-4">
                                 <div class="d-flex justify-content-end gap-1">
-                                    <a href="{{ route('members.show', $member) }}" class="btn btn-icon btn-view" title="જુઓ">
+                                    <a href="{{ route('members.show', [$member, 'return_page' => request('page')]) }}" class="btn btn-icon btn-view" title="જુઓ">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                    <a href="{{ route('members.edit', $member) }}" class="btn btn-icon btn-edit" title="એડિટ">
+                                    <a href="{{ route('members.edit', [$member, 'return_page' => request('page')]) }}" class="btn btn-icon btn-edit" title="એડિટ">
                                         <i class="bi bi-pencil"></i>
                                     </a>
                                     <form action="{{ route('api.members.destroy', $member) }}" method="POST" class="d-inline" data-api-delete-form data-api-url="{{ route('api.members.destroy', $member) }}" data-reload="true">
@@ -344,13 +344,44 @@
         
         @if($members->hasPages())
             <div class="card-footer bg-white border-0 py-3 border-top">
-                <div class="d-flex justify-content-center">
-                    {{ $members->links() }}
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+                    <div class="text-muted small">
+                        Showing <strong>{{ $members->firstItem() }}</strong> to <strong>{{ $members->lastItem() }}</strong> of <strong>{{ $members->total() }}</strong> results
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="pagination-wrapper">
+                            {{ $members->links('pagination::bootstrap-5') }}
+                        </div>
+                        <div class="goto-page d-flex align-items-center gap-2 ms-md-3 border-start ps-md-3">
+                            <span class="small text-muted">Page</span>
+                            <input type="number" id="gotoPageInput" class="form-control form-control-sm text-center" style="width: 60px;" min="1" max="{{ $members->lastPage() }}" value="{{ $members->currentPage() }}">
+                            <button type="button" onclick="goToPage()" class="btn btn-sm btn-maroon fw-bold">Go</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         @endif
     </div>
 </div>
+
+@push('scripts')
+<script>
+    function goToPage() {
+        const page = document.getElementById('gotoPageInput').value;
+        if (page && page >= 1 && page <= {{ $members->lastPage() }}) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('page', page);
+            window.location.href = url.toString();
+        }
+    }
+    
+    document.getElementById('gotoPageInput')?.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            goToPage();
+        }
+    });
+</script>
+@endpush
 
 <form id="printSelectedForm" action="{{ route('members.print.all') }}" method="GET" target="_blank" class="d-none"></form>
 <script>

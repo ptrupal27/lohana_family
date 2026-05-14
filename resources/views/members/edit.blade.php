@@ -5,8 +5,8 @@
     <div>
         <nav aria-label="breadcrumb" class="d-none d-md-block">
             <ol class="breadcrumb mb-1">
-                <li class="breadcrumb-item small"><a href="{{ route('members.index') }}">સભ્યોની યાદી</a></li>
-                <li class="breadcrumb-item small"><a href="{{ route('members.show', $member) }}">સભ્યની વિગતો</a></li>
+                <li class="breadcrumb-item small"><a href="{{ request('from_main') ? route('members.main', ['page' => request('return_page')]) : route('members.index', ['page' => request('return_page')]) }}">સભ્યોની યાદી</a></li>
+                <li class="breadcrumb-item small"><a href="{{ route('members.show', [$member, 'return_page' => request('return_page'), 'from_main' => request('from_main')]) }}">સભ્યની વિગતો</a></li>
                 <li class="breadcrumb-item small active" aria-current="page">એડિટ કરો</li>
             </ol>
         </nav>
@@ -50,7 +50,7 @@
     </div>
 
 
-    <form action="{{ route('api.members.update', $member) }}" method="POST" enctype="multipart/form-data" id="wizardForm" novalidate data-api-form data-api-url="{{ route('api.members.update', $member) }}" data-api-method="PUT" data-redirect-template="{{ route('members.show', '__MEMBER__') }}">
+    <form action="{{ route('api.members.update', $member) }}" method="POST" enctype="multipart/form-data" id="wizardForm" novalidate data-api-form data-api-url="{{ route('api.members.update', $member) }}" data-api-method="PUT" data-redirect-template="{{ route('members.show', ['member' => '__MEMBER__', 'return_page' => request('return_page'), 'from_main' => request('from_main')]) }}">
         @csrf
         @method('PUT')
         
@@ -148,8 +148,8 @@
                         <input type="text" name="city_village" id="main_city_village" class="form-control form-control-lg bg-light" value="{{ old('city_village', $member->city_village) }}" required>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label fw-bold">પિનકોડ <span class="text-danger">*</span></label>
-                        <input type="number" name="pincode" id="main_pincode" class="form-control form-control-lg bg-light" value="{{ old('pincode', $member->pincode) }}" placeholder="જેમ કે 395010" required>
+                        <label class="form-label fw-bold">પિનકોડ</label>
+                        <input type="number" name="pincode" id="main_pincode" class="form-control form-control-lg bg-light" value="{{ old('pincode', $member->pincode) }}" placeholder="જેમ કે 395010">
                     </div>
 
                     <div class="col-md-4">
@@ -170,7 +170,7 @@
                 </div>
 
                 <div class="mt-5 pt-4 border-top d-flex flex-column flex-sm-row justify-content-between gap-3 member-form-actions">
-                    <a href="{{ route('members.show', $member) }}" class="btn btn-lg btn-light px-md-5 fw-bold order-2 order-sm-1">કેન્સલ</a>
+                    <a href="{{ route('members.show', [$member, 'return_page' => request('return_page'), 'from_main' => request('from_main')]) }}" class="btn btn-lg btn-light px-md-5 fw-bold order-2 order-sm-1">કેન્સલ</a>
                     <div class="wizard-nav-btns order-1 order-sm-2 d-flex gap-2">
                         <button type="button" class="btn btn-lg btn-maroon px-md-5 fw-bold next-btn w-100 w-sm-auto">આગળ વધો <i class="bi bi-arrow-right ms-2"></i></button>
                         <button type="submit" class="btn btn-lg btn-success px-md-5 fw-bold submit-btn d-none w-100 w-sm-auto">બધી વિગતો અપડેટ કરો</button>
@@ -276,8 +276,8 @@
                             <input type="text" name="family[{{ $index }}][city_village]" id="city_village_{{ $index }}" class="form-control form-control-lg bg-light" value="{{ old('family.'.$index.'.city_village', $child->city_village) }}" required>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label fw-bold">પિનકોડ <span class="text-danger">*</span></label>
-                            <input type="number" name="family[{{ $index }}][pincode]" id="pincode_{{ $index }}" class="form-control form-control-lg bg-light" value="{{ old('family.'.$index.'.pincode', $child->pincode) }}" placeholder="જેમ કે 395010" required>
+                            <label class="form-label fw-bold">પિનકોડ</label>
+                            <input type="number" name="family[{{ $index }}][pincode]" id="pincode_{{ $index }}" class="form-control form-control-lg bg-light" value="{{ old('family.'.$index.'.pincode', $child->pincode) }}" placeholder="જેમ કે 395010">
                         </div>
                     </div>
 
@@ -391,8 +391,8 @@
             <input type="text" name="family[INDEX][city_village]" id="city_village_INDEX" class="form-control form-control-lg bg-light" required>
         </div>
         <div class="col-md-3">
-            <label class="form-label fw-bold">પિનકોડ <span class="text-danger">*</span></label>
-            <input type="number" name="family[INDEX][pincode]" id="pincode_INDEX" class="form-control form-control-lg bg-light" placeholder="જેમ કે 395010" required>
+            <label class="form-label fw-bold">પિનકોડ</label>
+            <input type="number" name="family[INDEX][pincode]" id="pincode_INDEX" class="form-control form-control-lg bg-light" placeholder="જેમ કે 395010">
         </div>
     </div>
 

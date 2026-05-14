@@ -5,7 +5,7 @@
     <div>
         <nav aria-label="breadcrumb" class="d-none d-md-block">
             <ol class="breadcrumb mb-1">
-                <li class="breadcrumb-item small"><a href="{{ route('members.index') }}">સભ્યોની યાદી</a></li>
+                <li class="breadcrumb-item small"><a href="{{ request('from_main') ? route('members.main', ['page' => request('return_page')]) : route('members.index', ['page' => request('return_page')]) }}">સભ્યોની યાદી</a></li>
                 <li class="breadcrumb-item small active" aria-current="page">સભ્યની વિગતો</li>
             </ol>
         </nav>
@@ -15,7 +15,7 @@
         <a href="{{ route('members.print.single', $member) }}" target="_blank" class="btn btn-outline-dark px-3 py-2 fw-bold">
             <i class="bi bi-printer me-2"></i> પ્રિન્ટ
         </a>
-        <a href="{{ route('members.edit', $member) }}" class="btn btn-primary px-3 py-2 fw-bold">
+        <a href="{{ route('members.edit', [$member, 'return_page' => request('return_page'), 'from_main' => request('from_main')]) }}" class="btn btn-primary px-3 py-2 fw-bold">
             <i class="bi bi-pencil me-2"></i> એડિટ કરો
         </a>
     </div>
@@ -231,11 +231,11 @@
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-bold">શહેર / ગામ <span class="text-danger">*</span></label>
-                            <input type="text" name="city_village" id="modal_city_village" class="form-control" required>
+                            <input type="text" name="city_village" id="modal_city_village" class="form-control" value="સુરત" required>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label small fw-bold">પિનકોડ <span class="text-danger">*</span></label>
-                            <input type="number" name="pincode" id="modal_pincode" class="form-control" required>
+                            <label class="form-label small fw-bold">પિનકોડ</label>
+                            <input type="number" name="pincode" id="modal_pincode" class="form-control">
                         </div>
                         
                         <div class="col-md-4">

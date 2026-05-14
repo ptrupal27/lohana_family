@@ -333,7 +333,7 @@ class MemberController extends Controller
             $membersQuery->whereIn('member_no', $selectedMembers);
         }
 
-        if ($request->has('search') && $request->search != '') {
+        if ($request->filled('search')) {
             $search = $request->get('search');
             $membersQuery->where(function ($q) use ($search) {
                 $q->where('member_no', 'like', "%{$search}%")
@@ -344,6 +344,14 @@ class MemberController extends Controller
                     ->orWhere('mobile', 'like', "%{$search}%")
                     ->orWhere('alternate_mobile', 'like', "%{$search}%");
             });
+        }
+
+        if ($request->filled('area')) {
+            $membersQuery->where('area', $request->get('area'));
+        }
+
+        if ($request->has('is_main')) {
+            $membersQuery->where('is_main', $request->get('is_main'));
         }
 
         $members = $membersQuery->get();
@@ -432,6 +440,14 @@ class MemberController extends Controller
                     ->orWhere('mobile', 'like', "%{$search}%")
                     ->orWhere('alternate_mobile', 'like', "%{$search}%");
             });
+        }
+
+        if ($request->filled('area')) {
+            $query->where('area', $request->get('area'));
+        }
+
+        if ($request->has('is_main')) {
+            $query->where('is_main', $request->get('is_main'));
         }
 
         $members = $query->get();

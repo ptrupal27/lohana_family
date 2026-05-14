@@ -45,7 +45,7 @@ class FamilyMemberRequest extends FormRequest
             'address' => 'required|string',
             'area' => 'required|string|max:255',
             'city_village' => 'required|string|max:255',
-            'pincode' => 'required|numeric',
+            'pincode' => 'nullable|numeric',
             'mobile' => 'nullable|digits:10',
             'email' => 'nullable|email|max:255',
             'date_of_birth' => 'required|date',
