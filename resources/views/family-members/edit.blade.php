@@ -113,8 +113,8 @@
                 </div>
 
                 <div class="col-md-3 mb-3">
-                    <label class="form-label">પિનકોડ <span class="text-danger">*</span></label>
-                    <input type="number" name="pincode" class="form-control" value="{{ old('pincode', $familyMember->pincode) }}" required>
+                    <label class="form-label">પિનકોડ</label>
+                    <input type="number" name="pincode" class="form-control" value="{{ old('pincode', $familyMember->pincode) }}">
                 </div>
 
                 <div class="col-md-4 mb-3">
